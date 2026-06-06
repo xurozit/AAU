@@ -325,6 +325,11 @@ document.getElementById('filters').addEventListener('click', e => {
 });
 
 render();
+// Freeze button widths to prevent reflow on active state change
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  const w = btn.getBoundingClientRect().width;
+  btn.style.width = w + 'px';
+});
 </script>
 </body>
 </html>
