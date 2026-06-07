@@ -1,340 +1,320 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ফালুদা দৌৰ — Faluda Sprint</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='30' fill='%23ff4d6d'/><text y='.75em' font-size='55' x='18' fill='white' font-family='sans-serif' font-weight='bold'>🍹</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraTask - Premium Todo & Focus Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Noise filter overlay -->
-  <svg style="position:fixed;width:0;height:0">
-    <filter id="noise">
-      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
-      <feColorMatrix type="saturate" values="0"/>
-    </filter>
-  </svg>
-  <div class="noise-overlay"></div>
-  <!-- Ambient Glow Backgrounds -->
-  <div class="glow-orb orb-1"></div>
-  <div class="glow-orb orb-2"></div>
-  <div class="app-container">
-    <!-- Sidebar / Navigation -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="mascot-wrapper">
-          <!-- Custom SVG Faluda Glass mascot -->
-          <svg class="faluda-mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <!-- Glass rim & body outline -->
-            <path d="M 25,15 L 75,15 L 65,75 L 35,75 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
-            <!-- Liquid/layers inside -->
-            <!-- Pistachio/Milk layer -->
-            <path d="M 32.5,25 L 67.5,25 L 60,65 L 40,65 Z" fill="var(--pistachio-light)" opacity="0.65" />
-            <!-- Strawberry/Rose layer at bottom -->
-            <path d="M 39,60 L 61,60 L 58.5,74 L 41.5,74 Z" fill="var(--rose-primary)" opacity="0.75" />
-            <!-- Ice cream dollop -->
-            <path d="M 28,17 C 28,5 45,5 50,12 C 55,5 72,5 72,17 Z" fill="#fff5f6" />
-            <circle cx="50" cy="18" r="3" fill="var(--rose-secondary)" />
-            <!-- Straw -->
-            <line x1="42" y1="5" x2="62" y2="70" stroke="var(--accent-yellow)" stroke-width="4" stroke-linecap="round" />
-            <!-- Glass stand -->
-            <path d="M 45,75 L 55,75 L 55,85 L 45,85 Z" fill="none" stroke="currentColor" stroke-width="3" />
-            <ellipse cx="50" cy="85" rx="18" ry="4" fill="none" stroke="currentColor" stroke-width="3" />
-          </svg>
-        </div>
-        <div class="brand-text">
-          <h1>ফালুদা দৌৰ</h1>
-          <span class="sub-brand">Faluda Sprint</span>
-        </div>
-      </div>
-      <nav class="nav-menu">
-        <button class="nav-item active" onclick="switchApp('tasks')" id="tab-tasks">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
-          <span>Tasks</span>
-        </button>
-        <button class="nav-item" onclick="switchApp('notes')" id="tab-notes">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>Notes</span>
-        </button>
-        <button class="nav-item" onclick="switchApp('stats')" id="tab-stats">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-          <span>Stats & Sprint</span>
-        </button>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="system-controls">
-          <button class="control-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
-            <svg class="icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg class="icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
-          <button class="control-btn" id="sound-toggle" onclick="toggleSound()" title="Mute/Unmute Audio feedback">
-            <svg class="icon sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-            <svg class="icon sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-          </button>
-        </div>
-        <div class="footer-credit">
-          <p>© 2026 Surajit Laskar</p>
-        </div>
-      </div>
-    </aside>
-    <!-- Main Content Area -->
-    <main class="main-content">
-      <!-- Top Header -->
-      <header class="app-header">
-        <div class="header-left">
-          <div class="date-container">
-            <span id="date-display">Sunday, June 7</span>
-          </div>
-        </div>
-        <div class="header-right">
-          <!-- Streak Badge -->
-          <div class="streak-badge" title="Daily Sprint Streak">
-            <span class="emoji">🔥</span>
-            <span id="streak-count">0</span>
-          </div>
-          <!-- Clock -->
-          <div class="clock-panel">
-            <span id="clock-time" class="time">23:02:42</span>
-            <div class="progress-bar-container">
-              <div id="seconds-bar" class="progress-bar-fill"></div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">A</div>
+                <div class="brand-title">AuraTask</div>
             </div>
-          </div>
-        </div>
-      </header>
-      <!-- ══ TASKS VIEW ══ -->
-      <section id="tasks-view" class="view-panel">
-        <div class="view-header">
-          <h2>Sprint Tasks</h2>
-          <p class="subtitle">Complete your tasks to finish your daily sprint.</p>
-        </div>
-        <div class="task-composer-card">
-          <div class="input-row">
-            <input type="text" id="task-input" placeholder="Add a new task..." maxlength="80" autocomplete="off">
-            <button class="add-task-btn" onclick="addTask()" title="Add Task (Enter)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-          </div>
-          
-          <div class="task-meta-row">
-            <div class="priority-selection">
-              <span class="label">Priority:</span>
-              <div class="priority-btns">
-                <button class="prio-btn active" data-p="low" onclick="selectPriority('low')">
-                  <span class="p-dot low"></span>Low
-                </button>
-                <button class="prio-btn" data-p="mid" onclick="selectPriority('mid')">
-                  <span class="p-dot mid"></span>Mid
-                </button>
-                <button class="prio-btn" data-p="high" onclick="selectPriority('high')">
-                  <span class="p-dot high"></span>High
-                </button>
-              </div>
-            </div>
-            
-            <div class="keyboard-tips">
-              <span class="tip"><kbd>Alt</kbd>+<kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> Priorities</span>
-            </div>
-          </div>
-        </div>
-        <!-- Task List Navigation & Filters -->
-        <div class="list-controls">
-          <div class="filter-tabs">
-            <button class="filter-tab active" data-f="all" onclick="setFilter('all')">
-              All <span id="cnt-all" class="badge"></span>
-            </button>
-            <button class="filter-tab" data-f="active" onclick="setFilter('active')">
-              Active <span id="cnt-active" class="badge"></span>
-            </button>
-            <button class="filter-tab" data-f="done" onclick="setFilter('done')">
-              Done <span id="cnt-done" class="badge"></span>
-            </button>
-          </div>
-          
-          <div class="sort-controls">
-            <button class="ghost-btn" id="sort-btn" onclick="toggleSort()" title="Sort tasks by Priority">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18H3M21 14H3M17 10H3M12 6H3"/></svg>
-              <span>Sort by Priority</span>
-            </button>
-          </div>
-        </div>
-        <!-- Scrollable Task List -->
-        <div class="task-list-wrapper">
-          <ul id="task-list" class="task-list"></ul>
-        </div>
-        <!-- Task Footer -->
-        <div class="view-footer">
-          <span id="task-counter" class="counter">0 tasks remaining</span>
-          <button class="btn danger-outline" id="clear-btn" onclick="clearDone()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            Clear Completed
-          </button>
-        </div>
-      </section>
-      <!-- ══ NOTES VIEW ══ -->
-      <section id="notes-view" class="view-panel" style="display:none;">
-        <!-- Notes List Subview -->
-        <div id="notes-list-view">
-          <div class="view-header">
-            <div class="header-action-row">
-              <div>
-                <h2>Personal Notebook</h2>
-                <p class="subtitle">Capture your thoughts, plans, and recipes.</p>
-              </div>
-              <button class="btn primary-btn" onclick="newNote()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New Note
-              </button>
-            </div>
-          </div>
-          <!-- Notes Filter Toolbar -->
-          <div class="notes-toolbar">
-            <div class="notes-filter-tabs">
-              <button class="filter-tab active" data-nf="all" onclick="setNoteFilter('all')">
-                All Notes <span id="ncnt-all" class="badge"></span>
-              </button>
-              <button class="filter-tab" data-nf="active" onclick="setNoteFilter('active')">
-                Active <span id="ncnt-active" class="badge"></span>
-              </button>
-              <button class="filter-tab" data-nf="archived" onclick="setNoteFilter('archived')">
-                Archived <span id="ncnt-archived" class="badge"></span>
-              </button>
-            </div>
-            
-            <button class="btn danger-outline text-btn" id="clear-archived-btn" onclick="clearArchived()" style="display:none;">
-              Clear Archived
-            </button>
-          </div>
-          <!-- Notes Grid -->
-          <div class="notes-grid-wrapper">
-            <div id="notes-list" class="notes-grid"></div>
-          </div>
-          <div class="view-footer">
-            <span id="notes-counter" class="counter">0 notes total</span>
-          </div>
-        </div>
-        <!-- Note Editor Subview (Slide-in panel style) -->
-        <div id="note-editor-view" class="note-editor-container" style="display:none;">
-          <div class="editor-header">
-            <button class="btn back-btn" onclick="closeEditor()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-              Back
-            </button>
-            
-            <div class="editor-actions">
-              <button class="btn secondary-btn" id="archive-toggle-btn" onclick="toggleArchiveCurrent()">
-                Archive
-              </button>
-              <button class="btn danger-outline text-btn" onclick="deleteCurrentNote()">
-                Delete
-              </button>
-            </div>
-          </div>
-          <div class="editor-card" id="editor-card">
-            <!-- Note Color Picker -->
-            <div class="editor-color-picker">
-              <span class="picker-label">Color:</span>
-              <div class="color-options">
-                <button class="color-dot color-default active" data-color="default" onclick="setNoteColor('default')" title="Milk Cream"></button>
-                <button class="color-dot color-rose" data-color="rose" onclick="setNoteColor('rose')" title="Strawberry Rose"></button>
-                <button class="color-dot color-mango" data-color="mango" onclick="setNoteColor('mango')" title="Mango Yellow"></button>
-                <button class="color-dot color-pistachio" data-color="pistachio" onclick="setNoteColor('pistachio')" title="Pistachio Green"></button>
-                <button class="color-dot color-blueberry" data-color="blueberry" onclick="setNoteColor('blueberry')" title="Blueberry Blue"></button>
-              </div>
-            </div>
-            <input type="text" id="note-title-input" placeholder="Title your thoughts..." maxlength="60" autocomplete="off">
-            <textarea id="note-body-input" placeholder="Write something amazing..."></textarea>
-          </div>
-        </div>
-      </section>
-      <!-- ══ STATS & SPRINT VIEW ══ -->
-      <section id="stats-view" class="view-panel" style="display:none;">
-        <div class="view-header">
-          <h2>Sprint Statistics</h2>
-          <p class="subtitle">Track your consistency and monitor your productivity.</p>
-        </div>
-        <!-- Stats Overview Grid -->
-        <div class="stats-overview-grid">
-          <div class="stat-card">
-            <div class="stat-icon rose-tint">🔥</div>
-            <div class="stat-info">
-              <span class="stat-val" id="stats-streak">0 days</span>
-              <span class="stat-lbl">Active Streak</span>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon pistachio-tint">✓</div>
-            <div class="stat-info">
-              <span class="stat-val" id="stats-completed">0</span>
-              <span class="stat-lbl">Completed Today</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon mango-tint">📊</div>
-            <div class="stat-info">
-              <span class="stat-val" id="stats-all-time">0</span>
-              <span class="stat-lbl">Total Tasks Done</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon blue-tint">📅</div>
-            <div class="stat-info">
-              <span class="stat-val" id="stats-days-active">0</span>
-              <span class="stat-lbl">Days Tracked</span>
-            </div>
-          </div>
-        </div>
-        <div class="stats-charts-row">
-          <!-- Circular Progress Card -->
-          <div class="chart-card">
-            <h3>Completion Ratio</h3>
-            <div class="ratio-chart-wrapper">
-              <div class="progress-ring-container">
-                <svg class="progress-ring" width="160" height="160">
-                  <circle class="progress-ring-bg" stroke="var(--border)" stroke-width="12" fill="transparent" r="70" cx="80" cy="80"/>
-                  <circle class="progress-ring-bar" id="ratio-progress-circle" stroke="var(--rose-primary)" stroke-width="12" fill="transparent" r="70" cx="80" cy="80"/>
-                </svg>
-                <div class="progress-ring-text">
-                  <span id="ratio-percent" class="percent">0%</span>
-                  <span class="desc">Done Today</span>
+            <!-- Categories Section -->
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <span class="section-title">Categories</span>
+                    <button class="btn-icon-sm" id="btn-add-category" title="Create Category">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
-              </div>
-            </div>
-          </div>
-          <!-- Heatmap Card -->
-          <div class="chart-card heatmap-card">
-            <h3>Consistency Grid</h3>
-            <p class="chart-subtitle">Your task completions over the last 15 weeks</p>
-            <div class="heatmap-wrapper">
-              <div class="heatmap-grid" id="heatmap-grid"></div>
-              <div class="heatmap-legend">
-                <span>Less</span>
-                <div class="legend-cells">
-                  <div class="legend-cell level-0"></div>
-                  <div class="legend-cell level-1"></div>
-                  <div class="legend-cell level-2"></div>
-                  <div class="legend-cell level-3"></div>
+                <div class="category-list" id="category-list">
+                    <!-- Dynamic Category list will go here -->
                 </div>
-                <span>More</span>
-              </div>
             </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-  <!-- Toast system -->
-  <div class="toast" id="toast">
-    <div class="toast-content">
-      <span id="toast-message">Task removed</span>
-      <button class="toast-undo" onclick="undoDelete()">Undo</button>
+            <!-- Import/Export & Data Section -->
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <span class="section-title">System Tools</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn-pomo" id="btn-export-data" title="Export Backup Data">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Backup</span>
+                    </button>
+                    <button class="btn-pomo" id="btn-import-data" title="Import Backup Data">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Restore</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Pomodoro Focus Widget -->
+            <div class="pomodoro-widget" id="pomodoro-widget">
+                <div class="pomo-title-row">
+                    <span class="pomo-status" id="pomo-status-label">Ready to Focus</span>
+                    <svg width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24" id="pomo-status-icon">
+                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="pomo-timer-display" id="pomo-timer-display">25:00</div>
+                <div class="pomo-controls">
+                    <button class="btn-pomo primary-pomo" id="pomo-start-btn">Start</button>
+                    <button class="btn-pomo" id="pomo-reset-btn">Reset</button>
+                </div>
+            </div>
+        </aside>
+        <!-- Main Dashboard View -->
+        <main class="main-dashboard">
+            <!-- Greeting & Header Controls -->
+            <header class="dashboard-header">
+                <div class="greeting-section">
+                    <h1 id="greeting-text">Hello, Explorer</h1>
+                    <p id="current-date-text">Loading date...</p>
+                </div>
+                <div class="header-controls">
+                    <!-- Search Bar -->
+                    <div class="search-box">
+                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input type="text" id="task-search-input" placeholder="Search tasks...">
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <button class="btn-icon-sm" id="btn-theme-toggle" style="width: 36px; height: 36px; border-radius: 50%; background: var(--bg-glass); border: 1px solid var(--border-glass);" title="Toggle Light/Dark Theme">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="theme-icon">
+                            <!-- Moon Path -->
+                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+            <!-- Stats Hub Widgets -->
+            <section class="stats-hub">
+                <!-- Completion Card -->
+                <div class="stat-card">
+                    <div class="stat-visual">
+                        <svg class="stat-ring" width="60" height="60">
+                            <circle class="stat-ring-bg" cx="30" cy="30" r="26" />
+                            <circle class="stat-ring-progress" id="stat-progress-ring" cx="30" cy="30" r="26" stroke-dasharray="163.36" stroke-dashoffset="163.36" />
+                        </svg>
+                        <div class="stat-visual-icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Completion</span>
+                        <span class="stat-value" id="stat-progress-pct">0%</span>
+                        <span class="stat-sub" id="stat-completed-total">0 of 0 completed</span>
+                    </div>
+                </div>
+                <!-- Daily Streak Card -->
+                <div class="stat-card">
+                    <div class="stat-visual" style="background: rgba(245, 158, 11, 0.1); border-radius: 50%;">
+                        <div class="stat-visual-icon" style="color: var(--accent-amber); position: static;">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Daily Streak</span>
+                        <span class="stat-value" id="stat-streak-val">0 Days</span>
+                        <span class="stat-sub" id="stat-streak-sub">Keep the chain going!</span>
+                    </div>
+                </div>
+                <!-- Active Focus Card -->
+                <div class="stat-card">
+                    <div class="stat-visual" style="background: rgba(139, 92, 246, 0.1); border-radius: 50%;">
+                        <div class="stat-visual-icon" style="color: var(--primary); position: static;">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Focus Sessions</span>
+                        <span class="stat-value" id="stat-focus-sessions">0</span>
+                        <span class="stat-sub" id="stat-focus-time">0m total focus time</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Quick Add Task Bar -->
+            <section class="quick-add-bar">
+                <input type="text" class="quick-add-input" id="quick-add-input" placeholder="Type a task and press Enter to save instantly...">
+                <button class="btn-primary" id="quick-add-submit-btn">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Quick Add</span>
+                </button>
+                <button class="btn-secondary" id="btn-open-advanced" style="padding: 0.75rem 1rem;" title="Advanced Task Form">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </section>
+            <!-- Filters Navigation and Sorting controls -->
+            <section class="filter-nav">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-tab="all">All Tasks</button>
+                    <button class="filter-tab" data-tab="pending">Active</button>
+                    <button class="filter-tab" data-tab="completed">Completed</button>
+                    <button class="filter-tab" data-tab="overdue">Overdue</button>
+                </div>
+                
+                <div class="list-controls">
+                    <!-- Priority Filter -->
+                    <select class="select-control" id="filter-priority">
+                        <option value="all">All Priorities</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                    <!-- Sorting controls -->
+                    <select class="select-control" id="sort-tasks">
+                        <option value="dueDate-asc">Due: Soonest</option>
+                        <option value="dueDate-desc">Due: Latest</option>
+                        <option value="priority-desc">Priority: High to Low</option>
+                        <option value="priority-asc">Priority: Low to High</option>
+                        <option value="title-asc">A to Z</option>
+                    </select>
+                </div>
+            </section>
+            <!-- Dynamically populated tasks container -->
+            <section class="tasks-container" id="tasks-container">
+                <!-- Fallback empty state -->
+                <div class="no-tasks">
+                    <svg class="no-tasks-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div>
+                        <h3>No tasks found</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Create a task or clear filters to get started.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-  </div>
-  <div id="stats-bar" class="bottom-stats-banner"></div>
-  <script src="app.js"></script>
+    <!-- Modals Section -->
+    <!-- Add/Edit Advanced Task Modal -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="task-modal-title">New Task</h2>
+                <button class="btn-icon-sm" id="btn-close-task-modal">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="task-form" onsubmit="return false;">
+                <input type="hidden" id="edit-task-id" value="">
+                
+                <div class="form-group">
+                    <label class="form-label" for="modal-task-title">Title</label>
+                    <input type="text" class="form-control" id="modal-task-title" required placeholder="What needs to be done?">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="modal-task-desc">Description</label>
+                    <textarea class="form-control" id="modal-task-desc" placeholder="Add some context or details..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="modal-task-category">Category</label>
+                        <select class="form-control" id="modal-task-category">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="modal-task-priority">Priority</label>
+                        <select class="form-control" id="modal-task-priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="modal-task-due">Due Date</label>
+                    <input type="datetime-local" class="form-control" id="modal-task-due">
+                </div>
+                <!-- Subtasks Checklist Section -->
+                <div class="form-group">
+                    <label class="form-label">Subtasks Checklist</label>
+                    <div class="checklist-builder">
+                        <div class="checklist-input-row">
+                            <input type="text" class="form-control" id="subtask-add-input" placeholder="Add subtask item...">
+                            <button type="button" class="btn-primary" id="btn-add-subtask-item" style="padding: 0.5rem 1rem;">Add</button>
+                        </div>
+                        <div class="checklist-items" id="modal-checklist-items">
+                            <!-- Added subtasks list -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-cancel-task">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-save-task">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Add/Edit Category Modal -->
+    <div class="modal-overlay" id="category-modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h2 class="modal-title">New Category</h2>
+                <button class="btn-icon-sm" id="btn-close-category-modal">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="category-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label class="form-label" for="modal-cat-name">Category Name</label>
+                    <input type="text" class="form-control" id="modal-cat-name" required placeholder="e.g. Design, Exercise, Shopping">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Theme Color</label>
+                    <div class="color-picker-row" id="color-picker-row">
+                        <!-- Populated dynamically in app.js -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-cancel-category">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-save-category">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Restore Data Modal -->
+    <div class="modal-overlay" id="import-modal">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Restore Backup</h2>
+                <button class="btn-icon-sm" id="btn-close-import-modal">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Select backup file (.json)</label>
+                <input type="file" id="import-file-input" accept=".json" class="form-control">
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Warning: Restoring will merge tasks with your current lists.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="btn-cancel-import">Cancel</button>
+                <button type="button" class="btn-primary" id="btn-execute-import">Restore</button>
+            </div>
+        </div>
+    </div>
+    <!-- Application Script -->
+    <script src="app.js"></script>
 </body>
 </html>
