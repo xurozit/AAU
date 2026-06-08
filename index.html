@@ -9,94 +9,85 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
 body{background:#ffd6ec;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Press Start 2P',monospace;}
-#grid-bg{position:fixed;inset:0;background-image:linear-gradient(#ffb8d9 1px,transparent 1px),linear-gradient(90deg,#ffb8d9 1px,transparent 1px);background-size:16px 16px;opacity:0.45;pointer-events:none;}
-#gc{position:relative;width:360px;height:420px;cursor:crosshair;overflow:hidden;}
-canvas#iso{display:block;width:360px;height:420px;image-rendering:pixelated;}
-#speech{position:absolute;background:#fff8f0;border:3px solid #5a2d6b;padding:5px 8px;font-size:5.5px;color:#3a1040;max-width:130px;line-height:1.8;display:none;z-index:30;pointer-events:none;}
+#gc{position:relative;width:min(96vw,600px);aspect-ratio:560/600;cursor:crosshair;overflow:hidden;}
+#grid-bg{position:absolute;inset:0;background-image:linear-gradient(#ffb8d9 1px,transparent 1px),linear-gradient(90deg,#ffb8d9 1px,transparent 1px);background-size:12px 12px;opacity:0.4;pointer-events:none;z-index:1;}
+canvas#iso{display:block;width:100%;height:100%;image-rendering:pixelated;position:relative;z-index:2;}
+#speech{position:absolute;background:#fff8f0;border:3px solid #5a2d6b;padding:5px 8px;font-size:5px;color:#3a1040;max-width:110px;line-height:1.9;display:none;z-index:30;pointer-events:none;}
 #speech::after{content:'';position:absolute;bottom:-10px;left:12px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:10px solid #fff8f0;}
 #speech::before{content:'';position:absolute;bottom:-14px;left:10px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:13px solid #5a2d6b;}
 #speech.on{display:block;}
-#lbl{margin-top:10px;font-size:6.5px;color:#8b2252;letter-spacing:1.5px;}
-#hint{margin-top:5px;font-size:5px;color:#c080a0;letter-spacing:0.5px;}
-.ripple{position:absolute;width:8px;height:8px;border:2px solid #ff80c0;pointer-events:none;z-index:20;transform:translate(-50%,-50%);animation:rip 0.35s steps(4) forwards;}
-@keyframes rip{0%{width:4px;height:4px;opacity:1}50%{width:16px;height:16px;opacity:.6}100%{width:26px;height:26px;opacity:0}}
+#lbl{margin-top:10px;font-size:6px;color:#8b2252;letter-spacing:2px;}
+#hint{margin-top:5px;font-size:5px;color:#c080a0;letter-spacing:1px;}
+.ripple{position:absolute;width:6px;height:6px;border:2px solid #ff80c0;pointer-events:none;z-index:20;transform:translate(-50%,-50%);animation:rip 0.35s steps(4) forwards;}
+@keyframes rip{0%{width:3px;height:3px;opacity:1}50%{width:14px;height:14px;opacity:.6}100%{width:22px;height:22px;opacity:0}}
 </style>
 </head>
 <body>
-<div id="grid-bg"></div>
 <div id="gc">
-  <canvas id="iso" width="360" height="420"></canvas>
+  <div id="grid-bg"></div>
+  <canvas id="iso" width="560" height="600"></canvas>
   <div id="speech"></div>
 </div>
 <div id="lbl">XUROZIT'S ROOM</div>
 <div id="hint">TAP TO EXPLORE</div>
 
 <script>
-const C = document.getElementById('iso');
-const ctx = C.getContext('2d');
-ctx.imageSmoothingEnabled = false;
+const C=document.getElementById('iso');
+const ctx=C.getContext('2d');
+ctx.imageSmoothingEnabled=false;
 
-const TW = 32, TH = 16;
-const COLS = 7, ROWS = 7;
-const OX = 180, OY = 60;
+const CW=560, CH=600;
+const TW=24, TH=12;
+const COLS=11, ROWS=11;
+const OX=280, OY=70;
 
-function isoX(c,r){ return OX + (c - r) * (TW/2); }
-function isoY(c,r){ return OY + (c + r) * (TH/2); }
+function isoX(c,r){ return OX+(c-r)*(TW/2); }
+function isoY(c,r){ return OY+(c+r)*(TH/2); }
 
-const FLOOR = '#e8c898', FLOOR2 = '#d4b484', FLOOR_S = '#b89060';
-const WALL_L = '#f0d8c0', WALL_D = '#d4b898', WALL_TOP = '#fff0e0';
-const GREEN1='#50c050', GREEN2='#208020';
+const FLOOR='#e8c898', FLOOR2='#d4b484', FLOOR_S='#b89060';
+const WALL_L='#f0d8c0', WALL_D='#d4b898', WALL_TOP='#fff0e0';
 
-function tile(c, r, top, left, right){
-  const x = isoX(c,r), y = isoY(c,r);
-  ctx.fillStyle = top;
+function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),w,h); }
+
+function tile(c,r,top,left,right){
+  const x=isoX(c,r), y=isoY(c,r);
+  ctx.fillStyle=top;
   ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x+TW/2, y+TH/2);
-  ctx.lineTo(x, y+TH);
-  ctx.lineTo(x-TW/2, y+TH/2);
-  ctx.closePath();
-  ctx.fill();
+  ctx.moveTo(x,y); ctx.lineTo(x+TW/2,y+TH/2);
+  ctx.lineTo(x,y+TH); ctx.lineTo(x-TW/2,y+TH/2);
+  ctx.closePath(); ctx.fill();
   if(left){
-    ctx.fillStyle = left;
+    ctx.fillStyle=left;
     ctx.beginPath();
-    ctx.moveTo(x-TW/2, y+TH/2);
-    ctx.lineTo(x, y+TH);
-    ctx.lineTo(x, y+TH+12);
-    ctx.lineTo(x-TW/2, y+TH/2+12);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(x-TW/2,y+TH/2); ctx.lineTo(x,y+TH);
+    ctx.lineTo(x,y+TH+10); ctx.lineTo(x-TW/2,y+TH/2+10);
+    ctx.closePath(); ctx.fill();
   }
   if(right){
-    ctx.fillStyle = right;
+    ctx.fillStyle=right;
     ctx.beginPath();
-    ctx.moveTo(x+TW/2, y+TH/2);
-    ctx.lineTo(x, y+TH);
-    ctx.lineTo(x, y+TH+12);
-    ctx.lineTo(x+TW/2, y+TH/2+12);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(x+TW/2,y+TH/2); ctx.lineTo(x,y+TH);
+    ctx.lineTo(x,y+TH+10); ctx.lineTo(x+TW/2,y+TH/2+10);
+    ctx.closePath(); ctx.fill();
   }
 }
-
-function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x,y,w,h); }
 
 function drawRoom(){
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
-      const top = (c+r)%2===0 ? FLOOR : FLOOR2;
-      const left = (r===ROWS-1) ? FLOOR_S : null;
-      const right = (c===COLS-1) ? '#c0a070' : null;
+      const top=(c+r)%2===0?FLOOR:FLOOR2;
+      const left=(r===ROWS-1)?FLOOR_S:null;
+      const right=(c===COLS-1)?'#c0a070':null;
       tile(c,r,top,left,right);
     }
   }
 }
 
 function wallBack(){
-  const x0=isoX(0,0), y0=isoY(0,0);
-  const x1=isoX(COLS-1,0), y1=isoY(COLS-1,0);
-  const x2=isoX(0,ROWS-1), y2=isoY(0,ROWS-1);
-  const WH=90;
+  const x0=isoX(0,0),y0=isoY(0,0);
+  const x1=isoX(COLS-1,0),y1=isoY(COLS-1,0);
+  const x2=isoX(0,ROWS-1),y2=isoY(0,ROWS-1);
+  const WH=110;
   ctx.fillStyle=WALL_L;
   ctx.beginPath();
   ctx.moveTo(x0,y0); ctx.lineTo(x0,y0-WH);
@@ -115,77 +106,86 @@ function wallBack(){
 }
 
 function drawWindow(){
-  const bx=isoX(0,1), by=isoY(0,1);
-  const wx=bx-14, wy=by-85;
-  px(wx,wy,28,38,'#7ec8f0');
-  px(wx,wy,28,4,'#7a4020');
-  px(wx,wy+34,28,4,'#7a4020');
-  px(wx,wy,4,38,'#7a4020');
-  px(wx+24,wy,4,38,'#7a4020');
-  px(wx+12,wy,2,38,'#5a3010');
-  px(wx,wy+17,28,2,'#5a3010');
-  px(wx+4,wy+4,8,10,'rgba(255,255,255,0.5)');
+  const bx=isoX(0,2),by=isoY(0,2);
+  const wx=bx-15,wy=by-102;
+  px(wx,wy,34,46,'#7ec8f0');
+  px(wx,wy,34,4,'#7a4020'); px(wx,wy+42,34,4,'#7a4020');
+  px(wx,wy,4,46,'#7a4020'); px(wx+30,wy,4,46,'#7a4020');
+  px(wx+15,wy,2,46,'#5a3010'); px(wx,wy+21,34,2,'#5a3010');
+  px(wx+4,wy+4,10,10,'rgba(255,255,255,0.45)');
+  px(wx+18,wy+4,8,8,'rgba(255,255,255,0.25)');
 }
 
 function drawShelf(){
-  const bx=isoX(3,0), by=isoY(3,0);
-  const sx=bx-20, sy=by-88;
-  px(sx,sy,40,60,'#8b5c2a');
-  px(sx,sy+20,40,4,'#5a3010');
-  px(sx,sy+42,40,4,'#5a3010');
-  const books=[['#ff5080',6],['#5080ff',6],['#50c050',6],['#ffcc00',6],['#ff80d0',5]];
-  books.forEach(([c,w],i)=>{ px(sx+2+i*7,sy+44,w,18,c); px(sx+2+i*7,sy+44,w,2,'rgba(0,0,0,0.2)'); });
-  px(sx+2,sy+6,5,14,'#ff5080'); px(sx+9,sy+6,5,14,'#50a0ff'); px(sx+16,sy+6,5,14,'#ffcc00');
+  const bx=isoX(5,0),by=isoY(5,0);
+  const sx=bx-26,sy=by-105;
+  px(sx,sy,52,72,'#8b5c2a');
+  px(sx,sy+24,52,4,'#5a3010');
+  px(sx,sy+50,52,4,'#5a3010');
+  px(sx,sy,4,72,'#5a3010'); px(sx+48,sy,4,72,'#5a3010');
+  const books=[['#ff5080',7],['#5080ff',7],['#50c050',7],['#ffcc00',7],['#ff80d0',6],['#e05050',6]];
+  books.forEach(([c,w],i)=>{ px(sx+5+i*8,sy+54,w,18,c); px(sx+5+i*8,sy+54,w,2,'rgba(0,0,0,0.18)'); });
+  px(sx+5,sy+8,6,16,'#ff5080'); px(sx+13,sy+8,6,16,'#50a0ff');
+  px(sx+21,sy+8,6,16,'#ffcc00'); px(sx+29,sy+8,5,12,'#60d060');
+  px(sx+5,sy+30,6,14,'#e07030'); px(sx+13,sy+30,6,14,'#9050e0');
+  px(sx+21,sy+30,6,14,'#50c0e0'); px(sx+29,sy+30,5,14,'#e05050');
 }
 
 function drawDesk(){
-  const bx=isoX(5,1), by=isoY(5,1);
-  const dx=bx-22, dy=by-52;
-  px(dx,dy,44,12,'#a07040');
-  px(dx,dy+12,5,16,'#7a5020'); px(dx+39,dy+12,5,16,'#7a5020');
-  px(dx+8,dy-24,28,22,'#2a2a2a');
-  px(dx+11,dy-21,22,16,'#3de0b0');
-  px(dx+20,dy-2,4,4,'#444');
-  px(dx+6,dy+2,10,6,'#c8882a');
+  const bx=isoX(8,2),by=isoY(8,2);
+  const dx=bx-28,dy=by-58;
+  px(dx,dy,56,14,'#a07040');
+  px(dx,dy+14,6,18,'#7a5020'); px(dx+50,dy+14,6,18,'#7a5020');
+  px(dx+10,dy-30,34,26,'#2a2a2a');
+  px(dx+13,dy-27,28,20,'#3de0b0');
+  px(dx+24,dy-4,5,5,'#444');
+  px(dx+6,dy+2,14,8,'#c8882a');
+  px(dx+8,dy+3,4,4,'#ffffff');
+  px(dx+24,dy+3,4,4,'#ffffff');
   ctx.fillStyle='#e87820';
-  ctx.beginPath(); ctx.arc(dx+11,dy+5,3,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(dx+13,dy+6,3,0,Math.PI*2); ctx.fill();
+  px(dx+34,dy+2,10,4,'#888'); px(dx+36,dy+4,6,2,'#aaa');
+}
+
+function drawBed(){
+  const bx=isoX(2,8),by=isoY(2,8);
+  const dx=bx-20,dy=by-44;
+  px(dx,dy,42,10,'#c87050');
+  px(dx,dy+10,42,28,'#e8a080');
+  px(dx+4,dy+12,34,22,'#f5c8b0');
+  px(dx,dy+10,42,4,'#d08060');
+  px(dx+2,dy+13,16,18,'#fffbe8');
+  px(dx+24,dy+13,14,18,'#fffbe8');
+  px(dx,dy,6,10,'#a05030'); px(dx+36,dy,6,10,'#a05030');
 }
 
 function drawPlant(){
-  const bx=isoX(1,5), by=isoY(1,5);
+  const bx=isoX(1,8),by=isoY(1,8);
   const S=2;
-  const p=(x,y,w,h,c)=>px(bx-20+x*S, by-8+y*S, w*S, h*S, c);
-
+  const p=(x,y,w,h,c)=>px(bx-20+x*S,by-8+y*S,w*S,h*S,c);
   p(7,0,6,1,'#c85020'); p(6,1,8,1,'#c85020');
   p(5,2,10,4,'#d06030'); p(5,2,10,1,'#e07848');
   p(6,6,8,1,'#a04010');
-
   p(9,-1,2,7,'#7a4820'); p(10,-1,2,7,'#9a6030');
   p(6,-4,3,2,'#7a4820'); p(4,-6,3,2,'#8a5428');
   p(11,-4,3,2,'#7a4820'); p(13,-5,3,2,'#8a5428');
-
   p(5,-12,10,4,'#1a6010'); p(3,-11,4,3,'#1a6010'); p(13,-11,4,3,'#1a6010');
   p(4,-15,12,5,'#1a6010'); p(2,-13,3,4,'#1a6010'); p(15,-13,3,4,'#1a6010');
   p(5,-18,10,4,'#1a6010'); p(3,-17,3,3,'#228020'); p(14,-17,3,3,'#228020');
   p(6,-21,8,4,'#228020'); p(4,-20,3,3,'#228020'); p(13,-20,3,3,'#228020');
   p(7,-23,6,3,'#228020');
-
   p(6,-13,8,3,'#38a828'); p(4,-12,3,3,'#38a828'); p(13,-12,3,3,'#38a828');
   p(5,-16,9,3,'#38a828'); p(3,-15,3,2,'#38a828'); p(14,-15,3,2,'#38a828');
   p(6,-19,8,3,'#38a828'); p(4,-18,3,2,'#38a828'); p(13,-18,3,2,'#38a828');
   p(7,-22,6,2,'#38a828'); p(5,-21,3,2,'#38a828'); p(12,-21,3,2,'#38a828');
-
   p(7,-14,4,2,'#7ee840'); p(5,-17,3,2,'#7ee840'); p(12,-16,3,2,'#60d030');
   p(8,-20,4,2,'#7ee840'); p(6,-22,3,2,'#a0f050'); p(11,-22,3,2,'#7ee840');
   p(9,-24,3,2,'#c8ff70'); p(7,-23,2,1,'#c8ff70');
   p(4,-13,2,2,'#60d030'); p(14,-14,2,2,'#50c020');
   p(10,-19,2,2,'#a0f050'); p(6,-11,2,2,'#60d030');
-
   p(9,-25,2,1,'#e8ffaa'); p(10,-24,2,1,'#e8ffaa');
-
   p(5,-9,4,2,'#0e3808'); p(11,-9,4,2,'#0e3808'); p(8,-10,4,2,'#0e3808');
   p(4,-8,3,2,'#0e3808'); p(13,-8,3,2,'#0e3808');
-
   p(2,7,2,3,'#50a020'); p(4,6,2,4,'#38a818'); p(6,7,2,3,'#50a020');
   p(14,7,2,3,'#50a020'); p(16,6,2,4,'#38a818'); p(18,7,2,3,'#50a020');
   p(8,7,2,2,'#60c030'); p(12,7,2,2,'#60c030');
@@ -194,71 +194,91 @@ function drawPlant(){
 }
 
 function drawRug(){
-  const bx=isoX(3,4), by=isoY(3,4);
+  const bx=isoX(5,6),by=isoY(5,6);
   ctx.fillStyle='#e84080';
   ctx.beginPath();
-  ctx.moveTo(bx,by-8); ctx.lineTo(bx+40,by+12); ctx.lineTo(bx,by+32); ctx.lineTo(bx-40,by+12);
+  ctx.moveTo(bx,by-12); ctx.lineTo(bx+54,by+15); ctx.lineTo(bx,by+42); ctx.lineTo(bx-54,by+15);
   ctx.closePath(); ctx.fill();
   ctx.fillStyle='#ff80b0';
   ctx.beginPath();
-  ctx.moveTo(bx,by); ctx.lineTo(bx+24,by+12); ctx.lineTo(bx,by+24); ctx.lineTo(bx-24,by+12);
+  ctx.moveTo(bx,by-2); ctx.lineTo(bx+36,by+16); ctx.lineTo(bx,by+34); ctx.lineTo(bx-36,by+16);
   ctx.closePath(); ctx.fill();
   ctx.fillStyle='#ff40a0';
   ctx.beginPath();
-  ctx.moveTo(bx,by+6); ctx.lineTo(bx+12,by+12); ctx.lineTo(bx,by+18); ctx.lineTo(bx-12,by+12);
+  ctx.moveTo(bx,by+6); ctx.lineTo(bx+18,by+15); ctx.lineTo(bx,by+24); ctx.lineTo(bx-18,by+15);
   ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#ffb8d8';
+  for(let i=-2;i<=2;i++){
+    px(bx+i*10-2,by+15-2,4,4,'#ffb8d8');
+  }
 }
 
 function drawPoster(){
-  const bx=isoX(2,0), by=isoY(2,0);
-  const px2=bx-16, py2=by-80;
-  px(px2,py2,32,26,'#ffe0f0');
-  px(px2+2,py2+2,28,22,'#ffb8d8');
-  px(px2+6,py2+5,8,8,'#ff5aaa');
-  px(px2+18,py2+5,6,6,'#5080ff');
-  px(px2+4,py2+16,22,4,'#ff80c0');
+  const bx=isoX(3,0),by=isoY(3,0);
+  const p2x=bx-20,p2y=by-100;
+  px(p2x,p2y,38,30,'#ffe0f0');
+  px(p2x+2,p2y+2,34,26,'#ffb8d8');
+  px(p2x+6,p2y+5,10,10,'#ff5aaa');
+  px(p2x+20,p2y+5,8,8,'#5080ff');
+  px(p2x+4,p2y+18,28,5,'#ff80c0');
+  px(p2x,p2y,38,3,'#cc6090');
 }
 
-let charPx=isoX(3,3), charPy=isoY(3,3);
-let targetC=3, targetR=3;
-let walking=false, speechT=null;
-let frame=0, animT=0;
+function drawPoster2(){
+  const bx=isoX(7,0),by=isoY(7,0);
+  const p2x=bx-18,p2y=by-98;
+  px(p2x,p2y,34,28,'#e0f0ff');
+  px(p2x+2,p2y+2,30,24,'#b8d8ff');
+  px(p2x+5,p2y+4,10,10,'#5080ff');
+  px(p2x+18,p2y+4,8,8,'#ff8050');
+  px(p2x+4,p2y+17,24,4,'#80a0ff');
+  px(p2x,p2y,34,3,'#4060cc');
+}
+
+let charPx=isoX(5,5),charPy=isoY(5,5);
+let targetC=5,targetR=5;
+let walking=false,speechT=null;
+let frame=0,animT=0;
 
 const lines=[
-  "Hmm...", "...", "*yawns*", "I should study.",
-  "Is someone there?", "*hums quietly*",
-  "One more minute...", "Did I water the plant?",
-  "The screen needs cleaning.", "*stretches*",
-  "Where are my notes?", "This room is cozy.",
-  "What time is it?", "Maybe after this chapter."
+  "Hmm...","...","*yawns*","I should study.",
+  "Is someone there?","*hums quietly*",
+  "One more minute...","Did I water the plant?",
+  "The screen needs cleaning.","*stretches*",
+  "Where are my notes?","This room is cozy.",
+  "What time is it?","Maybe after this chapter.",
+  "*looks around*","Need to clean up..."
 ];
 
 function showSpeech(txt){
   clearTimeout(speechT);
   const s=document.getElementById('speech');
   s.textContent=txt; s.classList.add('on');
-  const tx=charPx-16, ty=charPy-72;
-  s.style.left=Math.max(4,Math.min(220,tx))+'px';
-  s.style.top=Math.max(4,ty)+'px';
-  speechT=setTimeout(()=>s.classList.remove('on'),2500);
+  const gc=document.getElementById('gc');
+  const scaleX=gc.offsetWidth/CW;
+  const scaleY=gc.offsetHeight/CH;
+  const sx=charPx*scaleX,sy=charPy*scaleY;
+  s.style.left=Math.max(4,Math.min(gc.offsetWidth-120,sx-20))+'px';
+  s.style.top=Math.max(4,sy-80)+'px';
+  speechT=setTimeout(()=>s.classList.remove('on'),2800);
 }
 
 function drawSprite(spx,spy,flip,step){
   const f=step%2;
-  const bx=Math.round(spx)-6, by=Math.round(spy)-28;
-  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(flip?(bx+12-x-w):bx+x,by+y,w,h);};
-  p(3,0,6,6,'#f5c9a0');
-  p(2,1,8,5,'#1a1a1a');
-  p(1,3,10,2,'#555');
-  p(3,3,2,2,'#111'); p(7,3,2,2,'#111');
-  p(3,5,6,1,'#f5c9a0');
-  p(3,6,6,2,'#f5c9a0');
-  p(2,8,8,8,'#2a8a28');
-  p(1,8,1,6,'#f5c9a0'); p(10,8,1,6,'#f5c9a0');
-  p(3,16,5,6,'#1a1a1a');
-  if(f===0){ p(3,16,2,6,'#1a1a1a'); p(6,16,2,6,'#1a1a1a'); }
-  else { p(2,16,2,7,'#1a1a1a'); p(7,16,2,5,'#1a1a1a'); }
-  p(3,22,2,3,'#2a8a28'); p(6,22,2,3,'#1a1a1a');
+  const bx=Math.round(spx)-7,by=Math.round(spy)-32;
+  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(flip?(bx+14-x-w):bx+x,by+y,w,h);};
+  p(3,0,8,7,'#f5c9a0');
+  p(2,1,10,6,'#1a1a1a');
+  p(1,4,12,2,'#555');
+  p(3,4,2,2,'#111'); p(8,4,2,2,'#111');
+  p(3,6,8,1,'#f5c9a0');
+  p(3,7,8,3,'#f5c9a0');
+  p(2,10,10,9,'#2a8a28');
+  p(1,10,1,7,'#f5c9a0'); p(12,10,1,7,'#f5c9a0');
+  p(3,19,10,7,'#1a1a1a');
+  if(f===0){ p(3,19,3,7,'#1a1a1a'); p(7,19,3,7,'#1a1a1a'); }
+  else { p(2,19,3,8,'#1a1a1a'); p(8,19,3,6,'#1a1a1a'); }
+  p(3,26,3,4,'#2a8a28'); p(7,26,3,4,'#1a1a1a');
 }
 
 function lerp(a,b,t){ return a+(b-a)*t; }
@@ -266,16 +286,18 @@ function lerp(a,b,t){ return a+(b-a)*t; }
 let lastTime=0;
 function render(ts){
   const dt=ts-lastTime; lastTime=ts;
-  ctx.clearRect(0,0,360,420);
+  ctx.clearRect(0,0,CW,CH);
   wallBack();
   drawRoom();
   drawWindow();
   drawPoster();
+  drawPoster2();
   drawShelf();
   drawDesk();
+  drawBed();
   drawPlant();
   drawRug();
-  const tx=isoX(targetC,targetR), ty=isoY(targetC,targetR);
+  const tx=isoX(targetC,targetR),ty=isoY(targetC,targetR);
   if(walking){
     charPx=lerp(charPx,tx,0.1);
     charPy=lerp(charPy,ty,0.1);
@@ -293,8 +315,8 @@ requestAnimationFrame(render);
 
 setInterval(()=>{
   if(!walking){
-    targetC=1+Math.floor(Math.random()*(COLS-2));
-    targetR=1+Math.floor(Math.random()*(ROWS-2));
+    targetC=2+Math.floor(Math.random()*(COLS-4));
+    targetR=2+Math.floor(Math.random()*(ROWS-4));
     walking=true;
   }
 },6000);
@@ -302,17 +324,17 @@ setInterval(()=>{
 const gc=document.getElementById('gc');
 gc.addEventListener('click',e=>{
   const rect=gc.getBoundingClientRect();
-  const mx=(e.clientX-rect.left)*(360/rect.width);
-  const my=(e.clientY-rect.top)*(420/rect.height);
-  let best=null, bestD=9999;
+  const mx=(e.clientX-rect.left)*(CW/rect.width);
+  const my=(e.clientY-rect.top)*(CH/rect.height);
+  let best=null,bestD=9999;
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
-      const ix=isoX(c,r), iy=isoY(c,r)+TH/2;
+      const ix=isoX(c,r),iy=isoY(c,r)+TH/2;
       const d=Math.abs(mx-ix)+Math.abs(my-iy);
       if(d<bestD){bestD=d;best={c,r};}
     }
   }
-  if(best&&bestD<40){ targetC=best.c; targetR=best.r; walking=true; }
+  if(best&&bestD<32){ targetC=best.c; targetR=best.r; walking=true; }
   const rip=document.createElement('div');
   rip.className='ripple';
   rip.style.left=(e.clientX-rect.left)+'px';
