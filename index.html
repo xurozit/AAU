@@ -1,320 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraTask - Premium Todo & Focus Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xurozit's Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
+body{background:#ffd6ec;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Press Start 2P',monospace;}
+#grid-bg{position:fixed;inset:0;background-image:linear-gradient(#ffb8d9 1px,transparent 1px),linear-gradient(90deg,#ffb8d9 1px,transparent 1px);background-size:16px 16px;opacity:0.45;pointer-events:none;}
+#gc{position:relative;width:360px;height:420px;cursor:crosshair;overflow:hidden;}
+canvas#iso{display:block;width:360px;height:420px;image-rendering:pixelated;}
+#speech{position:absolute;background:#fff8f0;border:3px solid #5a2d6b;padding:5px 8px;font-size:5.5px;color:#3a1040;max-width:130px;line-height:1.8;display:none;z-index:30;pointer-events:none;}
+#speech::after{content:'';position:absolute;bottom:-10px;left:12px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:10px solid #fff8f0;}
+#speech::before{content:'';position:absolute;bottom:-14px;left:10px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:13px solid #5a2d6b;}
+#speech.on{display:block;}
+#lbl{margin-top:10px;font-size:6.5px;color:#8b2252;letter-spacing:1.5px;}
+#hint{margin-top:5px;font-size:5px;color:#c080a0;letter-spacing:0.5px;}
+.ripple{position:absolute;width:8px;height:8px;border:2px solid #ff80c0;pointer-events:none;z-index:20;transform:translate(-50%,-50%);animation:rip 0.35s steps(4) forwards;}
+@keyframes rip{0%{width:4px;height:4px;opacity:1}50%{width:16px;height:16px;opacity:.6}100%{width:26px;height:26px;opacity:0}}
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-icon">A</div>
-                <div class="brand-title">AuraTask</div>
-            </div>
-            <!-- Categories Section -->
-            <div class="sidebar-section">
-                <div class="section-header">
-                    <span class="section-title">Categories</span>
-                    <button class="btn-icon-sm" id="btn-add-category" title="Create Category">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="category-list" id="category-list">
-                    <!-- Dynamic Category list will go here -->
-                </div>
-            </div>
-            <!-- Import/Export & Data Section -->
-            <div class="sidebar-section">
-                <div class="section-header">
-                    <span class="section-title">System Tools</span>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn-pomo" id="btn-export-data" title="Export Backup Data">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>Backup</span>
-                    </button>
-                    <button class="btn-pomo" id="btn-import-data" title="Import Backup Data">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span>Restore</span>
-                    </button>
-                </div>
-            </div>
-            <!-- Pomodoro Focus Widget -->
-            <div class="pomodoro-widget" id="pomodoro-widget">
-                <div class="pomo-title-row">
-                    <span class="pomo-status" id="pomo-status-label">Ready to Focus</span>
-                    <svg width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24" id="pomo-status-icon">
-                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="pomo-timer-display" id="pomo-timer-display">25:00</div>
-                <div class="pomo-controls">
-                    <button class="btn-pomo primary-pomo" id="pomo-start-btn">Start</button>
-                    <button class="btn-pomo" id="pomo-reset-btn">Reset</button>
-                </div>
-            </div>
-        </aside>
-        <!-- Main Dashboard View -->
-        <main class="main-dashboard">
-            <!-- Greeting & Header Controls -->
-            <header class="dashboard-header">
-                <div class="greeting-section">
-                    <h1 id="greeting-text">Hello, Explorer</h1>
-                    <p id="current-date-text">Loading date...</p>
-                </div>
-                <div class="header-controls">
-                    <!-- Search Bar -->
-                    <div class="search-box">
-                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <input type="text" id="task-search-input" placeholder="Search tasks...">
-                    </div>
-                    
-                    <!-- Theme Toggle -->
-                    <button class="btn-icon-sm" id="btn-theme-toggle" style="width: 36px; height: 36px; border-radius: 50%; background: var(--bg-glass); border: 1px solid var(--border-glass);" title="Toggle Light/Dark Theme">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="theme-icon">
-                            <!-- Moon Path -->
-                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-            </header>
-            <!-- Stats Hub Widgets -->
-            <section class="stats-hub">
-                <!-- Completion Card -->
-                <div class="stat-card">
-                    <div class="stat-visual">
-                        <svg class="stat-ring" width="60" height="60">
-                            <circle class="stat-ring-bg" cx="30" cy="30" r="26" />
-                            <circle class="stat-ring-progress" id="stat-progress-ring" cx="30" cy="30" r="26" stroke-dasharray="163.36" stroke-dashoffset="163.36" />
-                        </svg>
-                        <div class="stat-visual-icon">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-label">Completion</span>
-                        <span class="stat-value" id="stat-progress-pct">0%</span>
-                        <span class="stat-sub" id="stat-completed-total">0 of 0 completed</span>
-                    </div>
-                </div>
-                <!-- Daily Streak Card -->
-                <div class="stat-card">
-                    <div class="stat-visual" style="background: rgba(245, 158, 11, 0.1); border-radius: 50%;">
-                        <div class="stat-visual-icon" style="color: var(--accent-amber); position: static;">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-label">Daily Streak</span>
-                        <span class="stat-value" id="stat-streak-val">0 Days</span>
-                        <span class="stat-sub" id="stat-streak-sub">Keep the chain going!</span>
-                    </div>
-                </div>
-                <!-- Active Focus Card -->
-                <div class="stat-card">
-                    <div class="stat-visual" style="background: rgba(139, 92, 246, 0.1); border-radius: 50%;">
-                        <div class="stat-visual-icon" style="color: var(--primary); position: static;">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-label">Focus Sessions</span>
-                        <span class="stat-value" id="stat-focus-sessions">0</span>
-                        <span class="stat-sub" id="stat-focus-time">0m total focus time</span>
-                    </div>
-                </div>
-            </section>
-            <!-- Quick Add Task Bar -->
-            <section class="quick-add-bar">
-                <input type="text" class="quick-add-input" id="quick-add-input" placeholder="Type a task and press Enter to save instantly...">
-                <button class="btn-primary" id="quick-add-submit-btn">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Quick Add</span>
-                </button>
-                <button class="btn-secondary" id="btn-open-advanced" style="padding: 0.75rem 1rem;" title="Advanced Task Form">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </section>
-            <!-- Filters Navigation and Sorting controls -->
-            <section class="filter-nav">
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-tab="all">All Tasks</button>
-                    <button class="filter-tab" data-tab="pending">Active</button>
-                    <button class="filter-tab" data-tab="completed">Completed</button>
-                    <button class="filter-tab" data-tab="overdue">Overdue</button>
-                </div>
-                
-                <div class="list-controls">
-                    <!-- Priority Filter -->
-                    <select class="select-control" id="filter-priority">
-                        <option value="all">All Priorities</option>
-                        <option value="high">High Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="low">Low Priority</option>
-                    </select>
-                    <!-- Sorting controls -->
-                    <select class="select-control" id="sort-tasks">
-                        <option value="dueDate-asc">Due: Soonest</option>
-                        <option value="dueDate-desc">Due: Latest</option>
-                        <option value="priority-desc">Priority: High to Low</option>
-                        <option value="priority-asc">Priority: Low to High</option>
-                        <option value="title-asc">A to Z</option>
-                    </select>
-                </div>
-            </section>
-            <!-- Dynamically populated tasks container -->
-            <section class="tasks-container" id="tasks-container">
-                <!-- Fallback empty state -->
-                <div class="no-tasks">
-                    <svg class="no-tasks-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <div>
-                        <h3>No tasks found</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Create a task or clear filters to get started.</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-    <!-- Modals Section -->
-    <!-- Add/Edit Advanced Task Modal -->
-    <div class="modal-overlay" id="task-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="task-modal-title">New Task</h2>
-                <button class="btn-icon-sm" id="btn-close-task-modal">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <form id="task-form" onsubmit="return false;">
-                <input type="hidden" id="edit-task-id" value="">
-                
-                <div class="form-group">
-                    <label class="form-label" for="modal-task-title">Title</label>
-                    <input type="text" class="form-control" id="modal-task-title" required placeholder="What needs to be done?">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="modal-task-desc">Description</label>
-                    <textarea class="form-control" id="modal-task-desc" placeholder="Add some context or details..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="modal-task-category">Category</label>
-                        <select class="form-control" id="modal-task-category">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="modal-task-priority">Priority</label>
-                        <select class="form-control" id="modal-task-priority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="modal-task-due">Due Date</label>
-                    <input type="datetime-local" class="form-control" id="modal-task-due">
-                </div>
-                <!-- Subtasks Checklist Section -->
-                <div class="form-group">
-                    <label class="form-label">Subtasks Checklist</label>
-                    <div class="checklist-builder">
-                        <div class="checklist-input-row">
-                            <input type="text" class="form-control" id="subtask-add-input" placeholder="Add subtask item...">
-                            <button type="button" class="btn-primary" id="btn-add-subtask-item" style="padding: 0.5rem 1rem;">Add</button>
-                        </div>
-                        <div class="checklist-items" id="modal-checklist-items">
-                            <!-- Added subtasks list -->
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" id="btn-cancel-task">Cancel</button>
-                    <button type="submit" class="btn-primary" id="btn-save-task">Save Task</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- Add/Edit Category Modal -->
-    <div class="modal-overlay" id="category-modal">
-        <div class="modal-content" style="max-width: 420px;">
-            <div class="modal-header">
-                <h2 class="modal-title">New Category</h2>
-                <button class="btn-icon-sm" id="btn-close-category-modal">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-            <form id="category-form" onsubmit="return false;">
-                <div class="form-group">
-                    <label class="form-label" for="modal-cat-name">Category Name</label>
-                    <input type="text" class="form-control" id="modal-cat-name" required placeholder="e.g. Design, Exercise, Shopping">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Theme Color</label>
-                    <div class="color-picker-row" id="color-picker-row">
-                        <!-- Populated dynamically in app.js -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" id="btn-cancel-category">Cancel</button>
-                    <button type="submit" class="btn-primary" id="btn-save-category">Create</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- Restore Data Modal -->
-    <div class="modal-overlay" id="import-modal">
-        <div class="modal-content" style="max-width: 440px;">
-            <div class="modal-header">
-                <h2 class="modal-title">Restore Backup</h2>
-                <button class="btn-icon-sm" id="btn-close-import-modal">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Select backup file (.json)</label>
-                <input type="file" id="import-file-input" accept=".json" class="form-control">
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Warning: Restoring will merge tasks with your current lists.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" id="btn-cancel-import">Cancel</button>
-                <button type="button" class="btn-primary" id="btn-execute-import">Restore</button>
-            </div>
-        </div>
-    </div>
-    <!-- Application Script -->
-    <script src="app.js"></script>
+<div id="grid-bg"></div>
+<div id="gc">
+  <canvas id="iso" width="360" height="420"></canvas>
+  <div id="speech"></div>
+</div>
+<div id="lbl">XUROZIT'S ROOM</div>
+<div id="hint">TAP TO EXPLORE</div>
+
+<script>
+const C = document.getElementById('iso');
+const ctx = C.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const TW = 32, TH = 16;
+const COLS = 7, ROWS = 7;
+const OX = 180, OY = 60;
+
+function isoX(c,r){ return OX + (c - r) * (TW/2); }
+function isoY(c,r){ return OY + (c + r) * (TH/2); }
+
+const FLOOR = '#e8c898', FLOOR2 = '#d4b484', FLOOR_S = '#b89060';
+const WALL_L = '#f0d8c0', WALL_D = '#d4b898', WALL_TOP = '#fff0e0';
+const GREEN1='#50c050', GREEN2='#208020';
+
+function tile(c, r, top, left, right){
+  const x = isoX(c,r), y = isoY(c,r);
+  ctx.fillStyle = top;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x+TW/2, y+TH/2);
+  ctx.lineTo(x, y+TH);
+  ctx.lineTo(x-TW/2, y+TH/2);
+  ctx.closePath();
+  ctx.fill();
+  if(left){
+    ctx.fillStyle = left;
+    ctx.beginPath();
+    ctx.moveTo(x-TW/2, y+TH/2);
+    ctx.lineTo(x, y+TH);
+    ctx.lineTo(x, y+TH+12);
+    ctx.lineTo(x-TW/2, y+TH/2+12);
+    ctx.closePath();
+    ctx.fill();
+  }
+  if(right){
+    ctx.fillStyle = right;
+    ctx.beginPath();
+    ctx.moveTo(x+TW/2, y+TH/2);
+    ctx.lineTo(x, y+TH);
+    ctx.lineTo(x, y+TH+12);
+    ctx.lineTo(x+TW/2, y+TH/2+12);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x,y,w,h); }
+
+function drawRoom(){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const top = (c+r)%2===0 ? FLOOR : FLOOR2;
+      const left = (r===ROWS-1) ? FLOOR_S : null;
+      const right = (c===COLS-1) ? '#c0a070' : null;
+      tile(c,r,top,left,right);
+    }
+  }
+}
+
+function wallBack(){
+  const x0=isoX(0,0), y0=isoY(0,0);
+  const x1=isoX(COLS-1,0), y1=isoY(COLS-1,0);
+  const x2=isoX(0,ROWS-1), y2=isoY(0,ROWS-1);
+  const WH=90;
+  ctx.fillStyle=WALL_L;
+  ctx.beginPath();
+  ctx.moveTo(x0,y0); ctx.lineTo(x0,y0-WH);
+  ctx.lineTo(x2,y2-WH); ctx.lineTo(x2,y2);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle=WALL_D;
+  ctx.beginPath();
+  ctx.moveTo(x0,y0); ctx.lineTo(x0,y0-WH);
+  ctx.lineTo(x1,y1-WH); ctx.lineTo(x1,y1);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle=WALL_TOP;
+  ctx.beginPath();
+  ctx.moveTo(x0,y0-WH); ctx.lineTo(x1,y1-WH);
+  ctx.lineTo(x2+x1-x0,y2+y1-y0-WH); ctx.lineTo(x2,y2-WH);
+  ctx.closePath(); ctx.fill();
+}
+
+function drawWindow(){
+  const bx=isoX(0,1), by=isoY(0,1);
+  const wx=bx-14, wy=by-85;
+  px(wx,wy,28,38,'#7ec8f0');
+  px(wx,wy,28,4,'#7a4020');
+  px(wx,wy+34,28,4,'#7a4020');
+  px(wx,wy,4,38,'#7a4020');
+  px(wx+24,wy,4,38,'#7a4020');
+  px(wx+12,wy,2,38,'#5a3010');
+  px(wx,wy+17,28,2,'#5a3010');
+  px(wx+4,wy+4,8,10,'rgba(255,255,255,0.5)');
+}
+
+function drawShelf(){
+  const bx=isoX(3,0), by=isoY(3,0);
+  const sx=bx-20, sy=by-88;
+  px(sx,sy,40,60,'#8b5c2a');
+  px(sx,sy+20,40,4,'#5a3010');
+  px(sx,sy+42,40,4,'#5a3010');
+  const books=[['#ff5080',6],['#5080ff',6],['#50c050',6],['#ffcc00',6],['#ff80d0',5]];
+  books.forEach(([c,w],i)=>{ px(sx+2+i*7,sy+44,w,18,c); px(sx+2+i*7,sy+44,w,2,'rgba(0,0,0,0.2)'); });
+  px(sx+2,sy+6,5,14,'#ff5080'); px(sx+9,sy+6,5,14,'#50a0ff'); px(sx+16,sy+6,5,14,'#ffcc00');
+}
+
+function drawDesk(){
+  const bx=isoX(5,1), by=isoY(5,1);
+  const dx=bx-22, dy=by-52;
+  px(dx,dy,44,12,'#a07040');
+  px(dx,dy+12,5,16,'#7a5020'); px(dx+39,dy+12,5,16,'#7a5020');
+  px(dx+8,dy-24,28,22,'#2a2a2a');
+  px(dx+11,dy-21,22,16,'#3de0b0');
+  px(dx+20,dy-2,4,4,'#444');
+  px(dx+6,dy+2,10,6,'#c8882a');
+  ctx.fillStyle='#e87820';
+  ctx.beginPath(); ctx.arc(dx+11,dy+5,3,0,Math.PI*2); ctx.fill();
+}
+
+function drawPlant(){
+  const bx=isoX(1,5), by=isoY(1,5);
+  px(bx-6,by-16,14,14,'#d06030');
+  px(bx-5,by-17,12,3,'#c05020');
+  px(bx-2,by-30,4,18,GREEN2);
+  px(bx-10,by-36,10,8,GREEN1); px(bx+2,by-40,10,8,GREEN1); px(bx-6,by-44,10,8,'#60d060');
+}
+
+function drawRug(){
+  const bx=isoX(3,4), by=isoY(3,4);
+  ctx.fillStyle='#e84080';
+  ctx.beginPath();
+  ctx.moveTo(bx,by-8); ctx.lineTo(bx+40,by+12); ctx.lineTo(bx,by+32); ctx.lineTo(bx-40,by+12);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#ff80b0';
+  ctx.beginPath();
+  ctx.moveTo(bx,by); ctx.lineTo(bx+24,by+12); ctx.lineTo(bx,by+24); ctx.lineTo(bx-24,by+12);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#ff40a0';
+  ctx.beginPath();
+  ctx.moveTo(bx,by+6); ctx.lineTo(bx+12,by+12); ctx.lineTo(bx,by+18); ctx.lineTo(bx-12,by+12);
+  ctx.closePath(); ctx.fill();
+}
+
+function drawPoster(){
+  const bx=isoX(2,0), by=isoY(2,0);
+  const px2=bx-16, py2=by-80;
+  px(px2,py2,32,26,'#ffe0f0');
+  px(px2+2,py2+2,28,22,'#ffb8d8');
+  px(px2+6,py2+5,8,8,'#ff5aaa');
+  px(px2+18,py2+5,6,6,'#5080ff');
+  px(px2+4,py2+16,22,4,'#ff80c0');
+}
+
+let charPx=isoX(3,3), charPy=isoY(3,3);
+let targetC=3, targetR=3;
+let walking=false, speechT=null;
+let frame=0, animT=0;
+
+const lines=[
+  "Hmm...", "...", "*yawns*", "I should study.",
+  "Is someone there?", "*hums quietly*",
+  "One more minute...", "Did I water the plant?",
+  "The screen needs cleaning.", "*stretches*",
+  "Where are my notes?", "This room is cozy.",
+  "What time is it?", "Maybe after this chapter."
+];
+
+function showSpeech(txt){
+  clearTimeout(speechT);
+  const s=document.getElementById('speech');
+  s.textContent=txt; s.classList.add('on');
+  const tx=charPx-16, ty=charPy-72;
+  s.style.left=Math.max(4,Math.min(220,tx))+'px';
+  s.style.top=Math.max(4,ty)+'px';
+  speechT=setTimeout(()=>s.classList.remove('on'),2500);
+}
+
+function drawSprite(spx,spy,flip,step){
+  const f=step%2;
+  const bx=Math.round(spx)-6, by=Math.round(spy)-28;
+  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(flip?(bx+12-x-w):bx+x,by+y,w,h);};
+  p(3,0,6,6,'#f5c9a0');
+  p(2,1,8,5,'#1a1a1a');
+  p(1,3,10,2,'#555');
+  p(3,3,2,2,'#111'); p(7,3,2,2,'#111');
+  p(3,5,6,1,'#f5c9a0');
+  p(3,6,6,2,'#f5c9a0');
+  p(2,8,8,8,'#2a8a28');
+  p(1,8,1,6,'#f5c9a0'); p(10,8,1,6,'#f5c9a0');
+  p(3,16,5,6,'#1a1a1a');
+  if(f===0){ p(3,16,2,6,'#1a1a1a'); p(6,16,2,6,'#1a1a1a'); }
+  else { p(2,16,2,7,'#1a1a1a'); p(7,16,2,5,'#1a1a1a'); }
+  p(3,22,2,3,'#2a8a28'); p(6,22,2,3,'#1a1a1a');
+}
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+let lastTime=0;
+function render(ts){
+  const dt=ts-lastTime; lastTime=ts;
+  ctx.clearRect(0,0,360,420);
+  wallBack();
+  drawRoom();
+  drawWindow();
+  drawPoster();
+  drawShelf();
+  drawDesk();
+  drawPlant();
+  drawRug();
+  const tx=isoX(targetC,targetR), ty=isoY(targetC,targetR);
+  if(walking){
+    charPx=lerp(charPx,tx,0.1);
+    charPy=lerp(charPy,ty,0.1);
+    if(Math.abs(charPx-tx)<1&&Math.abs(charPy-ty)<1){
+      charPx=tx; charPy=ty; walking=false;
+      if(Math.random()<0.4) showSpeech(lines[Math.floor(Math.random()*lines.length)]);
+    }
+    animT+=dt;
+    if(animT>200){animT=0;frame++;}
+  }
+  drawSprite(charPx,charPy,tx<charPx,walking?frame:0);
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+setInterval(()=>{
+  if(!walking){
+    targetC=1+Math.floor(Math.random()*(COLS-2));
+    targetR=1+Math.floor(Math.random()*(ROWS-2));
+    walking=true;
+  }
+},6000);
+
+const gc=document.getElementById('gc');
+gc.addEventListener('click',e=>{
+  const rect=gc.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)*(360/rect.width);
+  const my=(e.clientY-rect.top)*(420/rect.height);
+  let best=null, bestD=9999;
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const ix=isoX(c,r), iy=isoY(c,r)+TH/2;
+      const d=Math.abs(mx-ix)+Math.abs(my-iy);
+      if(d<bestD){bestD=d;best={c,r};}
+    }
+  }
+  if(best&&bestD<40){ targetC=best.c; targetR=best.r; walking=true; }
+  const rip=document.createElement('div');
+  rip.className='ripple';
+  rip.style.left=(e.clientX-rect.left)+'px';
+  rip.style.top=(e.clientY-rect.top)+'px';
+  gc.appendChild(rip);
+  setTimeout(()=>rip.remove(),380);
+});
+</script>
 </body>
 </html>
