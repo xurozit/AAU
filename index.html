@@ -3,345 +3,827 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xurozit's Room</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Contradictions Learning System</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
-body{background:#ffd6ec;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Press Start 2P',monospace;}
-#gc{position:relative;width:min(96vw,600px);aspect-ratio:560/600;cursor:crosshair;overflow:hidden;}
-#grid-bg{position:absolute;inset:0;background-image:linear-gradient(#ffb8d9 1px,transparent 1px),linear-gradient(90deg,#ffb8d9 1px,transparent 1px);background-size:12px 12px;opacity:0.4;pointer-events:none;z-index:1;}
-canvas#iso{display:block;width:100%;height:100%;image-rendering:pixelated;position:relative;z-index:2;}
-#speech{position:absolute;background:#fff8f0;border:3px solid #5a2d6b;padding:5px 8px;font-size:5px;color:#3a1040;max-width:110px;line-height:1.9;display:none;z-index:30;pointer-events:none;}
-#speech::after{content:'';position:absolute;bottom:-10px;left:12px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:10px solid #fff8f0;}
-#speech::before{content:'';position:absolute;bottom:-14px;left:10px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:13px solid #5a2d6b;}
-#speech.on{display:block;}
-#lbl{margin-top:10px;font-size:6px;color:#8b2252;letter-spacing:2px;}
-#hint{margin-top:5px;font-size:5px;color:#c080a0;letter-spacing:1px;}
-.ripple{position:absolute;width:6px;height:6px;border:2px solid #ff80c0;pointer-events:none;z-index:20;transform:translate(-50%,-50%);animation:rip 0.35s steps(4) forwards;}
-@keyframes rip{0%{width:3px;height:3px;opacity:1}50%{width:14px;height:14px;opacity:.6}100%{width:22px;height:22px;opacity:0}}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F2EC;
+    --bg2: #EDEAE1;
+    --bg3: #E4E0D5;
+    --ink: #1C1A14;
+    --ink2: #4A4740;
+    --ink3: #8A8780;
+    --accent: #C84B2F;
+    --accent2: #2B5F8A;
+    --gold: #B8892A;
+    --green: #2D6B4A;
+    --border: rgba(28,26,20,0.12);
+    --border2: rgba(28,26,20,0.22);
+    --serif: 'Fraunces', Georgia, serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 4rem 0 3rem;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-desc {
+    font-size: 1.05rem;
+    color: var(--ink2);
+    line-height: 1.7;
+    max-width: 500px;
+  }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--border2);
+  }
+
+  /* TENSION TABLE */
+  .tension-block {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .tension-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+  }
+
+  .tension-table thead th {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg2);
+  }
+
+  .tension-table thead th:nth-child(2) {
+    border-left: 1px solid var(--border2);
+    border-right: 1px solid var(--border2);
+    text-align: center;
+    width: 60px;
+  }
+
+  .tension-table thead th:last-child {
+    color: var(--accent);
+  }
+
+  .tension-table tbody tr {
+    border-bottom: 0.5px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .tension-table tbody tr:last-child { border-bottom: none; }
+  .tension-table tbody tr:hover { background: var(--bg2); }
+
+  .tension-table td {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    vertical-align: middle;
+  }
+
+  .tension-table td:nth-child(2) {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    text-align: center;
+    border-left: 0.5px solid var(--border);
+    border-right: 0.5px solid var(--border);
+    letter-spacing: 0.1em;
+  }
+
+  .tension-table td:last-child {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* PHASE CARDS */
+  .phases-block {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .phase-card {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .phase-card:first-of-type { border-radius: 2px 2px 0 0; }
+  .phase-card:last-of-type { border-radius: 0 0 2px 2px; margin-bottom: 0; }
+  .phase-card:hover { background: var(--bg2); }
+  .phase-card.open { background: var(--bg2); z-index: 1; }
+
+  .phase-header {
+    display: grid;
+    grid-template-columns: 2rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .phase-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .phase-title-wrap { }
+
+  .phase-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 2px;
+  }
+
+  .phase-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .phase-arrow {
+    font-size: 14px;
+    color: var(--ink3);
+    transition: transform 0.2s;
+    font-family: var(--mono);
+  }
+
+  .phase-card.open .phase-arrow { transform: rotate(180deg); }
+
+  .phase-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem 4.25rem;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .phase-card.open .phase-body { display: block; }
+
+  .phase-sub {
+    font-size: 0.9rem;
+    color: var(--ink2);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+    font-style: italic;
+    padding-top: 1rem;
+  }
+
+  .phase-content {
+    font-size: 0.9rem;
+    color: var(--ink2);
+    line-height: 1.75;
+  }
+
+  .phase-content strong {
+    font-weight: 500;
+    color: var(--ink);
+    font-style: normal;
+  }
+
+  .phase-content p { margin-bottom: 0.75rem; }
+  .phase-content p:last-child { margin-bottom: 0; }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border: 0.5px solid var(--border2);
+    background: var(--bg3);
+    color: var(--ink2);
+    border-radius: 1px;
+  }
+
+  .tag.accent { border-color: var(--accent); color: var(--accent); background: rgba(200,75,47,0.05); }
+  .tag.blue { border-color: var(--accent2); color: var(--accent2); background: rgba(43,95,138,0.05); }
+  .tag.gold { border-color: var(--gold); color: var(--gold); background: rgba(184,137,42,0.05); }
+  .tag.green { border-color: var(--green); color: var(--green); background: rgba(45,107,74,0.05); }
+
+  /* DAILY RHYTHM */
+  .rhythm-block {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .rhythm-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border2);
+    border: 1px solid var(--border2);
+  }
+
+  .rhythm-cell {
+    background: var(--bg);
+    padding: 1.25rem 1rem;
+    text-align: center;
+  }
+
+  .rhythm-time {
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .rhythm-label {
+    font-size: 0.8rem;
+    color: var(--ink2);
+    line-height: 1.4;
+  }
+
+  /* SPACING INTERVALS */
+  .spacing-block {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.35s ease both;
+  }
+
+  .spacing-track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--border2);
+    overflow: hidden;
+  }
+
+  .spacing-node {
+    flex: 1;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    background: var(--bg);
+    border-right: 0.5px solid var(--border2);
+    position: relative;
+  }
+
+  .spacing-node:last-child { border-right: none; }
+
+  .spacing-day {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 4px;
+  }
+
+  .spacing-action {
+    font-size: 0.8rem;
+    color: var(--ink2);
+    line-height: 1.4;
+  }
+
+  .spacing-node:nth-child(1) { background: rgba(200,75,47,0.06); }
+  .spacing-node:nth-child(2) { background: rgba(200,75,47,0.04); }
+  .spacing-node:nth-child(3) { background: rgba(200,75,47,0.025); }
+  .spacing-node:nth-child(4) { background: rgba(200,75,47,0.01); }
+  .spacing-node:nth-child(5) { background: var(--bg); }
+
+  /* SUBJECT PRIORITIES */
+  .subjects-block {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+
+  .subject-row {
+    display: grid;
+    grid-template-columns: 1.5rem 8rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border2);
+    margin-bottom: -1px;
+    background: var(--bg);
+    transition: background 0.15s;
+  }
+
+  .subject-row:first-of-type { border-radius: 2px 2px 0 0; }
+  .subject-row:last-of-type { border-radius: 0 0 2px 2px; margin-bottom: 0; }
+  .subject-row:hover { background: var(--bg2); }
+
+  .subject-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .subject-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .subject-note {
+    font-size: 0.85rem;
+    color: var(--ink2);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .subject-weight {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink3);
+    white-space: nowrap;
+  }
+
+  /* RULE CALLOUT */
+  .rule-block {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.7s 0.45s ease both;
+  }
+
+  .rule-callout {
+    border-left: 3px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    background: rgba(200,75,47,0.04);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .rule-callout p {
+    font-size: 1.1rem;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .rule-callout strong {
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .rule-callout cite {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink3);
+    margin-top: 8px;
+    font-style: normal;
+  }
+
+  /* QUICK ACTIONS */
+  .actions-block {
+    animation: fadeUp 0.7s 0.5s ease both;
+  }
+
+  .action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 0.95rem;
+    color: var(--ink);
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    background: var(--bg2);
+    border-color: var(--ink3);
+  }
+
+  .action-btn-label { line-height: 1.4; }
+  .action-btn-sub {
+    font-size: 0.8rem;
+    color: var(--ink3);
+    margin-top: 2px;
+  }
+
+  .action-btn-arrow {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    animation: fadeUp 0.7s 0.55s ease both;
+  }
+
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink3);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .container { padding: 0 1rem 4rem; }
+    .rhythm-grid { grid-template-columns: repeat(2, 1fr); }
+    .spacing-track { flex-direction: column; }
+    .spacing-node { border-right: none; border-bottom: 0.5px solid var(--border2); }
+    .spacing-node:last-child { border-bottom: none; }
+    .subject-row { grid-template-columns: 1.5rem 1fr auto; }
+    .subject-note { display: none; }
+    h1 { font-size: 2.2rem; }
+  }
 </style>
 </head>
 <body>
-<div id="gc">
-  <div id="grid-bg"></div>
-  <canvas id="iso" width="560" height="600"></canvas>
-  <div id="speech"></div>
+
+<div class="noise"></div>
+
+<div class="container">
+
+  <header class="header">
+    <div class="header-eyebrow">AAU CET-UG · Exam prep approach</div>
+    <h1>Learning through<br><em>beautiful contradictions</em></h1>
+    <p class="header-desc">You grasp ideas fast — but forget them fast. This system is built around that exact contradiction. Understanding and remembering are different processes. This addresses both.</p>
+  </header>
+
+  <!-- TENSION TABLE -->
+  <section class="tension-block">
+    <div class="section-label">The core tension</div>
+    <table class="tension-table">
+      <thead>
+        <tr>
+          <th>What you do naturally</th>
+          <th></th>
+          <th>What actually works</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Read new chapters, watch videos</td>
+          <td>vs</td>
+          <td>Retrieve old material, fail & correct</td>
+        </tr>
+        <tr>
+          <td>Re-read notes (recognition)</td>
+          <td>vs</td>
+          <td>Flashcards without hints (recall)</td>
+        </tr>
+        <tr>
+          <td>Block one subject per session</td>
+          <td>vs</td>
+          <td>Mix subjects on purpose (interleaving)</td>
+        </tr>
+        <tr>
+          <td>Review before you forget</td>
+          <td>vs</td>
+          <td>Review at the edge of forgetting</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PHASES -->
+  <section class="phases-block">
+    <div class="section-label">The 4-phase approach</div>
+
+    <div class="phase-card open" onclick="togglePhase(this)">
+      <div class="phase-header">
+        <div class="phase-num">01</div>
+        <div class="phase-title-wrap">
+          <div class="phase-eyebrow">First contact</div>
+          <div class="phase-title">Sprint to understand — not to remember</div>
+        </div>
+        <div class="phase-arrow">▾</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-sub">"Read once, fast. Your job is a rough mental model, not perfect recall."</div>
+        <div class="phase-content">
+          <p><strong>What to do:</strong> Read the NCERT section at full speed. Don't annotate. Don't re-read. At the end, close the book and write 3–5 bullet points from memory on a blank page — this is your first retrieval attempt, and it will feel uncomfortable. That discomfort is the learning.</p>
+          <p><strong>Why it works for you:</strong> You grasp fast, so the reading phase doesn't need to be long. The memory dump at the end is where the real encoding starts — because failure to recall is what signals your brain to consolidate.</p>
+          <p><strong>AAU CET tip:</strong> Biology chapters like Genetics and Plant Physiology have heavy terminology. During your dump, write the terms even if you can't define them — the act of writing activates retrieval pathways.</p>
+        </div>
+        <div class="tags">
+          <span class="tag accent">15–20 min/chapter</span>
+          <span class="tag">No highlighting</span>
+          <span class="tag">Blank-page memory dump</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this)">
+      <div class="phase-header">
+        <div class="phase-num">02</div>
+        <div class="phase-title-wrap">
+          <div class="phase-eyebrow">Same day</div>
+          <div class="phase-title">Make one terrible question per concept</div>
+        </div>
+        <div class="phase-arrow">▾</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-sub">"Turn your notes into questions you'll hate yourself for forgetting."</div>
+        <div class="phase-content">
+          <p><strong>What to do:</strong> For each concept, write a question that forces retrieval — not "What is photosynthesis?" but "What gas is released when light hits PS-II?" The answer goes on the back. Make it uncomfortable. Easy questions waste time.</p>
+          <p><strong>The contradiction:</strong> You'll feel like you already know the answer (because you just read it). This feeling is false confidence. Make the card anyway. Tomorrow-you will not remember today-you.</p>
+          <p><strong>For AAU CET:</strong> Focus on mechanism-type questions — "What happens when...", "Why does...", "What is the product of..." — because AAU CET favours application over definition.</p>
+        </div>
+        <div class="tags">
+          <span class="tag blue">20 min</span>
+          <span class="tag">Paper flashcards or Anki</span>
+          <span class="tag">Mechanism questions only</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this)">
+      <div class="phase-header">
+        <div class="phase-num">03</div>
+        <div class="phase-title-wrap">
+          <div class="phase-eyebrow">Spaced across days</div>
+          <div class="phase-title">Review at the edge of forgetting — not before</div>
+        </div>
+        <div class="phase-arrow">▾</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-sub">"Wait until it almost fades. Then retrieve. That gap is the medicine."</div>
+        <div class="phase-content">
+          <p><strong>What to do:</strong> Review flashcards at roughly these intervals: Day 1 → Day 3 → Day 7 → Day 14. Each time, attempt the answer before flipping. Cards you got right push to the next interval. Cards you got wrong reset to Day 1.</p>
+          <p><strong>The beautiful contradiction:</strong> Reviewing before you forget does almost nothing. Reviewing at the moment you're about to forget is what drives long-term retention. So intentionally waiting — even when it feels risky — is the correct move.</p>
+          <p><strong>Setup:</strong> Paper: three stacks — "tomorrow", "3 days", "1 week". Shuffle wrong cards back to stack one. Digital: Anki handles the algorithm automatically.</p>
+        </div>
+        <div class="tags">
+          <span class="tag gold">Day 1 → 3 → 7 → 14</span>
+          <span class="tag">Reset wrong cards</span>
+          <span class="tag">Anki or 3-stack paper</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this)">
+      <div class="phase-header">
+        <div class="phase-num">04</div>
+        <div class="phase-title-wrap">
+          <div class="phase-eyebrow">Weekly</div>
+          <div class="phase-title">Interleave — mix subjects on purpose</div>
+        </div>
+        <div class="phase-arrow">▾</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-sub">"Don't block one subject. Confusion is not a sign you're doing it wrong."</div>
+        <div class="phase-content">
+          <p><strong>What to do:</strong> Once a week, do a 20-question self-test pulling randomly from Biology, Chemistry, and Physics. Don't group by chapter. The switching friction is intentional — it forces your brain to identify the problem type before applying the method.</p>
+          <p><strong>Why this works:</strong> Blocked study (all Biology → all Chemistry) creates an illusion of mastery. Interleaved study is harder and feels less productive, but produces 40–50% better exam performance in timed tests — which is exactly what CET is.</p>
+          <p><strong>For AAU CET:</strong> Physics is your weakest — it benefits most from interleaved practice since concept-switching is where it typically breaks down.</p>
+        </div>
+        <div class="tags">
+          <span class="tag green">1–1.5 hr session</span>
+          <span class="tag">Random chapter mix</span>
+          <span class="tag">No chapter grouping</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- DAILY RHYTHM -->
+  <section class="rhythm-block">
+    <div class="section-label">Daily rhythm</div>
+    <div class="rhythm-grid">
+      <div class="rhythm-cell">
+        <div class="rhythm-time">20'</div>
+        <div class="rhythm-label">New chapter sprint</div>
+      </div>
+      <div class="rhythm-cell">
+        <div class="rhythm-time">20'</div>
+        <div class="rhythm-label">Make flashcards</div>
+      </div>
+      <div class="rhythm-cell">
+        <div class="rhythm-time">15'</div>
+        <div class="rhythm-label">Spaced review (old cards)</div>
+      </div>
+      <div class="rhythm-cell">
+        <div class="rhythm-time">5'</div>
+        <div class="rhythm-label">Memory dump — no notes</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPACING INTERVALS -->
+  <section class="spacing-block">
+    <div class="section-label">Spaced repetition intervals</div>
+    <div class="spacing-track">
+      <div class="spacing-node">
+        <div class="spacing-day">Day 1</div>
+        <div class="spacing-action">First review<br>after learning</div>
+      </div>
+      <div class="spacing-node">
+        <div class="spacing-day">Day 3</div>
+        <div class="spacing-action">Second review<br>(getting shaky)</div>
+      </div>
+      <div class="spacing-node">
+        <div class="spacing-day">Day 7</div>
+        <div class="spacing-action">Third review<br>(almost gone)</div>
+      </div>
+      <div class="spacing-node">
+        <div class="spacing-day">Day 14</div>
+        <div class="spacing-action">Fourth review<br>(deep consolidation)</div>
+      </div>
+      <div class="spacing-node">
+        <div class="spacing-day">Wrong?</div>
+        <div class="spacing-action">Reset to<br>Day 1 stack</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBJECTS -->
+  <section class="subjects-block">
+    <div class="section-label">AAU CET subject priorities</div>
+    <div class="subject-row">
+      <div class="subject-dot" style="background:#C84B2F"></div>
+      <div class="subject-name">Biology</div>
+      <div class="subject-note">Highest weightage (~40%). Start flashcard habit here. Heavy on terminology and mechanisms.</div>
+      <div class="subject-weight">~40%</div>
+    </div>
+    <div class="subject-row">
+      <div class="subject-dot" style="background:#2B5F8A"></div>
+      <div class="subject-name">Chemistry</div>
+      <div class="subject-note">Heavy on reactions and mechanisms. Perfect for "What is the product of..." style cards.</div>
+      <div class="subject-weight">~30%</div>
+    </div>
+    <div class="subject-row">
+      <div class="subject-dot" style="background:#B8892A"></div>
+      <div class="subject-name">Physics</div>
+      <div class="subject-note">Self-identified weak subject. Benefits most from interleaved practice and timed problem sets.</div>
+      <div class="subject-weight">~30%</div>
+    </div>
+  </section>
+
+  <!-- CORE RULE -->
+  <section class="rule-block">
+    <div class="section-label">The uncomfortable rule</div>
+    <div class="rule-callout">
+      <p>If reviewing feels <strong>easy</strong>, it's probably not working. The friction you feel when a flashcard stumps you — or when you can't remember what you read yesterday — is not a failure signal. It's the exact moment consolidation happens. <strong>Lean into it.</strong></p>
+      <cite>— Based on the testing effect and spaced repetition research</cite>
+    </div>
+  </section>
+
+  <!-- ACTIONS -->
+  <section class="actions-block">
+    <div class="section-label">Quick study actions (for Claude)</div>
+    <div class="action-list">
+      <a class="action-btn" href="https://claude.ai/new" target="_blank">
+        <div class="action-btn-label">
+          Generate a mixed quiz
+          <div class="action-btn-sub">Ask: "Give me a 10-question mixed CET quiz on Genetics, Photosynthesis, and Chemical Bonding"</div>
+        </div>
+        <div class="action-btn-arrow">↗</div>
+      </a>
+      <a class="action-btn" href="https://claude.ai/new" target="_blank">
+        <div class="action-btn-label">
+          Make flashcards for a chapter
+          <div class="action-btn-sub">Ask: "Make flashcard questions for NCERT Class 12 Biology: Reproduction in Organisms"</div>
+        </div>
+        <div class="action-btn-arrow">↗</div>
+      </a>
+      <a class="action-btn" href="https://claude.ai/new" target="_blank">
+        <div class="action-btn-label">
+          Check high-priority topics
+          <div class="action-btn-sub">Ask: "What are the highest-weightage topics in AAU CET-UG Biology?"</div>
+        </div>
+        <div class="action-btn-arrow">↗</div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-note">Contradictions Learning System · AAU CET-UG prep</div>
+    <div class="footer-note">Sprint to understand · Crawl to retain</div>
+  </footer>
+
 </div>
-<div id="lbl">XUROZIT'S ROOM</div>
-<div id="hint">TAP TO EXPLORE</div>
 
 <script>
-const C=document.getElementById('iso');
-const ctx=C.getContext('2d');
-ctx.imageSmoothingEnabled=false;
-
-const CW=560, CH=600;
-const TW=24, TH=12;
-const COLS=11, ROWS=11;
-const OX=280, OY=70;
-
-function isoX(c,r){ return OX+(c-r)*(TW/2); }
-function isoY(c,r){ return OY+(c+r)*(TH/2); }
-
-const FLOOR='#e8c898', FLOOR2='#d4b484', FLOOR_S='#b89060';
-const WALL_L='#f0d8c0', WALL_D='#d4b898', WALL_TOP='#fff0e0';
-
-function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),w,h); }
-
-function tile(c,r,top,left,right){
-  const x=isoX(c,r), y=isoY(c,r);
-  ctx.fillStyle=top;
-  ctx.beginPath();
-  ctx.moveTo(x,y); ctx.lineTo(x+TW/2,y+TH/2);
-  ctx.lineTo(x,y+TH); ctx.lineTo(x-TW/2,y+TH/2);
-  ctx.closePath(); ctx.fill();
-  if(left){
-    ctx.fillStyle=left;
-    ctx.beginPath();
-    ctx.moveTo(x-TW/2,y+TH/2); ctx.lineTo(x,y+TH);
-    ctx.lineTo(x,y+TH+10); ctx.lineTo(x-TW/2,y+TH/2+10);
-    ctx.closePath(); ctx.fill();
+  function togglePhase(card) {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.phase-card').forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
   }
-  if(right){
-    ctx.fillStyle=right;
-    ctx.beginPath();
-    ctx.moveTo(x+TW/2,y+TH/2); ctx.lineTo(x,y+TH);
-    ctx.lineTo(x,y+TH+10); ctx.lineTo(x+TW/2,y+TH/2+10);
-    ctx.closePath(); ctx.fill();
-  }
-}
-
-function drawRoom(){
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const top=(c+r)%2===0?FLOOR:FLOOR2;
-      const left=(r===ROWS-1)?FLOOR_S:null;
-      const right=(c===COLS-1)?'#c0a070':null;
-      tile(c,r,top,left,right);
-    }
-  }
-}
-
-function wallBack(){
-  const x0=isoX(0,0),y0=isoY(0,0);
-  const x1=isoX(COLS-1,0),y1=isoY(COLS-1,0);
-  const x2=isoX(0,ROWS-1),y2=isoY(0,ROWS-1);
-  const WH=110;
-  ctx.fillStyle=WALL_L;
-  ctx.beginPath();
-  ctx.moveTo(x0,y0); ctx.lineTo(x0,y0-WH);
-  ctx.lineTo(x2,y2-WH); ctx.lineTo(x2,y2);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle=WALL_D;
-  ctx.beginPath();
-  ctx.moveTo(x0,y0); ctx.lineTo(x0,y0-WH);
-  ctx.lineTo(x1,y1-WH); ctx.lineTo(x1,y1);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle=WALL_TOP;
-  ctx.beginPath();
-  ctx.moveTo(x0,y0-WH); ctx.lineTo(x1,y1-WH);
-  ctx.lineTo(x2+x1-x0,y2+y1-y0-WH); ctx.lineTo(x2,y2-WH);
-  ctx.closePath(); ctx.fill();
-}
-
-function drawWindow(){
-  const bx=isoX(0,2),by=isoY(0,2);
-  const wx=bx-15,wy=by-102;
-  px(wx,wy,34,46,'#7ec8f0');
-  px(wx,wy,34,4,'#7a4020'); px(wx,wy+42,34,4,'#7a4020');
-  px(wx,wy,4,46,'#7a4020'); px(wx+30,wy,4,46,'#7a4020');
-  px(wx+15,wy,2,46,'#5a3010'); px(wx,wy+21,34,2,'#5a3010');
-  px(wx+4,wy+4,10,10,'rgba(255,255,255,0.45)');
-  px(wx+18,wy+4,8,8,'rgba(255,255,255,0.25)');
-}
-
-function drawShelf(){
-  const bx=isoX(5,0),by=isoY(5,0);
-  const sx=bx-26,sy=by-105;
-  px(sx,sy,52,72,'#8b5c2a');
-  px(sx,sy+24,52,4,'#5a3010');
-  px(sx,sy+50,52,4,'#5a3010');
-  px(sx,sy,4,72,'#5a3010'); px(sx+48,sy,4,72,'#5a3010');
-  const books=[['#ff5080',7],['#5080ff',7],['#50c050',7],['#ffcc00',7],['#ff80d0',6],['#e05050',6]];
-  books.forEach(([c,w],i)=>{ px(sx+5+i*8,sy+54,w,18,c); px(sx+5+i*8,sy+54,w,2,'rgba(0,0,0,0.18)'); });
-  px(sx+5,sy+8,6,16,'#ff5080'); px(sx+13,sy+8,6,16,'#50a0ff');
-  px(sx+21,sy+8,6,16,'#ffcc00'); px(sx+29,sy+8,5,12,'#60d060');
-  px(sx+5,sy+30,6,14,'#e07030'); px(sx+13,sy+30,6,14,'#9050e0');
-  px(sx+21,sy+30,6,14,'#50c0e0'); px(sx+29,sy+30,5,14,'#e05050');
-}
-
-function drawDesk(){
-  const bx=isoX(8,2),by=isoY(8,2);
-  const dx=bx-28,dy=by-58;
-  px(dx,dy,56,14,'#a07040');
-  px(dx,dy+14,6,18,'#7a5020'); px(dx+50,dy+14,6,18,'#7a5020');
-  px(dx+10,dy-30,34,26,'#2a2a2a');
-  px(dx+13,dy-27,28,20,'#3de0b0');
-  px(dx+24,dy-4,5,5,'#444');
-  px(dx+6,dy+2,14,8,'#c8882a');
-  px(dx+8,dy+3,4,4,'#ffffff');
-  px(dx+24,dy+3,4,4,'#ffffff');
-  ctx.fillStyle='#e87820';
-  ctx.beginPath(); ctx.arc(dx+13,dy+6,3,0,Math.PI*2); ctx.fill();
-  px(dx+34,dy+2,10,4,'#888'); px(dx+36,dy+4,6,2,'#aaa');
-}
-
-function drawBed(){
-  const bx=isoX(2,8),by=isoY(2,8);
-  const dx=bx-20,dy=by-44;
-  px(dx,dy,42,10,'#c87050');
-  px(dx,dy+10,42,28,'#e8a080');
-  px(dx+4,dy+12,34,22,'#f5c8b0');
-  px(dx,dy+10,42,4,'#d08060');
-  px(dx+2,dy+13,16,18,'#fffbe8');
-  px(dx+24,dy+13,14,18,'#fffbe8');
-  px(dx,dy,6,10,'#a05030'); px(dx+36,dy,6,10,'#a05030');
-}
-
-function drawPlant(){
-  const bx=isoX(1,8),by=isoY(1,8);
-  const S=2;
-  const p=(x,y,w,h,c)=>px(bx-20+x*S,by-8+y*S,w*S,h*S,c);
-  p(7,0,6,1,'#c85020'); p(6,1,8,1,'#c85020');
-  p(5,2,10,4,'#d06030'); p(5,2,10,1,'#e07848');
-  p(6,6,8,1,'#a04010');
-  p(9,-1,2,7,'#7a4820'); p(10,-1,2,7,'#9a6030');
-  p(6,-4,3,2,'#7a4820'); p(4,-6,3,2,'#8a5428');
-  p(11,-4,3,2,'#7a4820'); p(13,-5,3,2,'#8a5428');
-  p(5,-12,10,4,'#1a6010'); p(3,-11,4,3,'#1a6010'); p(13,-11,4,3,'#1a6010');
-  p(4,-15,12,5,'#1a6010'); p(2,-13,3,4,'#1a6010'); p(15,-13,3,4,'#1a6010');
-  p(5,-18,10,4,'#1a6010'); p(3,-17,3,3,'#228020'); p(14,-17,3,3,'#228020');
-  p(6,-21,8,4,'#228020'); p(4,-20,3,3,'#228020'); p(13,-20,3,3,'#228020');
-  p(7,-23,6,3,'#228020');
-  p(6,-13,8,3,'#38a828'); p(4,-12,3,3,'#38a828'); p(13,-12,3,3,'#38a828');
-  p(5,-16,9,3,'#38a828'); p(3,-15,3,2,'#38a828'); p(14,-15,3,2,'#38a828');
-  p(6,-19,8,3,'#38a828'); p(4,-18,3,2,'#38a828'); p(13,-18,3,2,'#38a828');
-  p(7,-22,6,2,'#38a828'); p(5,-21,3,2,'#38a828'); p(12,-21,3,2,'#38a828');
-  p(7,-14,4,2,'#7ee840'); p(5,-17,3,2,'#7ee840'); p(12,-16,3,2,'#60d030');
-  p(8,-20,4,2,'#7ee840'); p(6,-22,3,2,'#a0f050'); p(11,-22,3,2,'#7ee840');
-  p(9,-24,3,2,'#c8ff70'); p(7,-23,2,1,'#c8ff70');
-  p(4,-13,2,2,'#60d030'); p(14,-14,2,2,'#50c020');
-  p(10,-19,2,2,'#a0f050'); p(6,-11,2,2,'#60d030');
-  p(9,-25,2,1,'#e8ffaa'); p(10,-24,2,1,'#e8ffaa');
-  p(5,-9,4,2,'#0e3808'); p(11,-9,4,2,'#0e3808'); p(8,-10,4,2,'#0e3808');
-  p(4,-8,3,2,'#0e3808'); p(13,-8,3,2,'#0e3808');
-  p(2,7,2,3,'#50a020'); p(4,6,2,4,'#38a818'); p(6,7,2,3,'#50a020');
-  p(14,7,2,3,'#50a020'); p(16,6,2,4,'#38a818'); p(18,7,2,3,'#50a020');
-  p(8,7,2,2,'#60c030'); p(12,7,2,2,'#60c030');
-  p(1,8,2,2,'#38a818'); p(19,8,2,2,'#38a818');
-  p(4,9,12,2,'rgba(0,0,0,0.12)');
-}
-
-function drawRug(){
-  const bx=isoX(5,6),by=isoY(5,6);
-  ctx.fillStyle='#e84080';
-  ctx.beginPath();
-  ctx.moveTo(bx,by-12); ctx.lineTo(bx+54,by+15); ctx.lineTo(bx,by+42); ctx.lineTo(bx-54,by+15);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#ff80b0';
-  ctx.beginPath();
-  ctx.moveTo(bx,by-2); ctx.lineTo(bx+36,by+16); ctx.lineTo(bx,by+34); ctx.lineTo(bx-36,by+16);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#ff40a0';
-  ctx.beginPath();
-  ctx.moveTo(bx,by+6); ctx.lineTo(bx+18,by+15); ctx.lineTo(bx,by+24); ctx.lineTo(bx-18,by+15);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#ffb8d8';
-  for(let i=-2;i<=2;i++){
-    px(bx+i*10-2,by+15-2,4,4,'#ffb8d8');
-  }
-}
-
-function drawPoster(){
-  const bx=isoX(3,0),by=isoY(3,0);
-  const p2x=bx-20,p2y=by-100;
-  px(p2x,p2y,38,30,'#ffe0f0');
-  px(p2x+2,p2y+2,34,26,'#ffb8d8');
-  px(p2x+6,p2y+5,10,10,'#ff5aaa');
-  px(p2x+20,p2y+5,8,8,'#5080ff');
-  px(p2x+4,p2y+18,28,5,'#ff80c0');
-  px(p2x,p2y,38,3,'#cc6090');
-}
-
-function drawPoster2(){
-  const bx=isoX(7,0),by=isoY(7,0);
-  const p2x=bx-18,p2y=by-98;
-  px(p2x,p2y,34,28,'#e0f0ff');
-  px(p2x+2,p2y+2,30,24,'#b8d8ff');
-  px(p2x+5,p2y+4,10,10,'#5080ff');
-  px(p2x+18,p2y+4,8,8,'#ff8050');
-  px(p2x+4,p2y+17,24,4,'#80a0ff');
-  px(p2x,p2y,34,3,'#4060cc');
-}
-
-let charPx=isoX(5,5),charPy=isoY(5,5);
-let targetC=5,targetR=5;
-let walking=false,speechT=null;
-let frame=0,animT=0;
-
-const lines=[
-  "Hmm...","...","*yawns*","I should study.",
-  "Is someone there?","*hums quietly*",
-  "One more minute...","Did I water the plant?",
-  "The screen needs cleaning.","*stretches*",
-  "Where are my notes?","This room is cozy.",
-  "What time is it?","Maybe after this chapter.",
-  "*looks around*","Need to clean up..."
-];
-
-function showSpeech(txt){
-  clearTimeout(speechT);
-  const s=document.getElementById('speech');
-  s.textContent=txt; s.classList.add('on');
-  const gc=document.getElementById('gc');
-  const scaleX=gc.offsetWidth/CW;
-  const scaleY=gc.offsetHeight/CH;
-  const sx=charPx*scaleX,sy=charPy*scaleY;
-  s.style.left=Math.max(4,Math.min(gc.offsetWidth-120,sx-20))+'px';
-  s.style.top=Math.max(4,sy-80)+'px';
-  speechT=setTimeout(()=>s.classList.remove('on'),2800);
-}
-
-function drawSprite(spx,spy,flip,step){
-  const f=step%2;
-  const bx=Math.round(spx)-7,by=Math.round(spy)-32;
-  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(flip?(bx+14-x-w):bx+x,by+y,w,h);};
-  p(3,0,8,7,'#f5c9a0');
-  p(2,1,10,6,'#1a1a1a');
-  p(1,4,12,2,'#555');
-  p(3,4,2,2,'#111'); p(8,4,2,2,'#111');
-  p(3,6,8,1,'#f5c9a0');
-  p(3,7,8,3,'#f5c9a0');
-  p(2,10,10,9,'#2a8a28');
-  p(1,10,1,7,'#f5c9a0'); p(12,10,1,7,'#f5c9a0');
-  p(3,19,10,7,'#1a1a1a');
-  if(f===0){ p(3,19,3,7,'#1a1a1a'); p(7,19,3,7,'#1a1a1a'); }
-  else { p(2,19,3,8,'#1a1a1a'); p(8,19,3,6,'#1a1a1a'); }
-  p(3,26,3,4,'#2a8a28'); p(7,26,3,4,'#1a1a1a');
-}
-
-function lerp(a,b,t){ return a+(b-a)*t; }
-
-let lastTime=0;
-function render(ts){
-  const dt=ts-lastTime; lastTime=ts;
-  ctx.clearRect(0,0,CW,CH);
-  wallBack();
-  drawRoom();
-  drawWindow();
-  drawPoster();
-  drawPoster2();
-  drawShelf();
-  drawDesk();
-  drawBed();
-  drawPlant();
-  drawRug();
-  const tx=isoX(targetC,targetR),ty=isoY(targetC,targetR);
-  if(walking){
-    charPx=lerp(charPx,tx,0.1);
-    charPy=lerp(charPy,ty,0.1);
-    if(Math.abs(charPx-tx)<1&&Math.abs(charPy-ty)<1){
-      charPx=tx; charPy=ty; walking=false;
-      if(Math.random()<0.4) showSpeech(lines[Math.floor(Math.random()*lines.length)]);
-    }
-    animT+=dt;
-    if(animT>200){animT=0;frame++;}
-  }
-  drawSprite(charPx,charPy,tx<charPx,walking?frame:0);
-  requestAnimationFrame(render);
-}
-requestAnimationFrame(render);
-
-setInterval(()=>{
-  if(!walking){
-    targetC=2+Math.floor(Math.random()*(COLS-4));
-    targetR=2+Math.floor(Math.random()*(ROWS-4));
-    walking=true;
-  }
-},6000);
-
-const gc=document.getElementById('gc');
-gc.addEventListener('click',e=>{
-  const rect=gc.getBoundingClientRect();
-  const mx=(e.clientX-rect.left)*(CW/rect.width);
-  const my=(e.clientY-rect.top)*(CH/rect.height);
-  let best=null,bestD=9999;
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const ix=isoX(c,r),iy=isoY(c,r)+TH/2;
-      const d=Math.abs(mx-ix)+Math.abs(my-iy);
-      if(d<bestD){bestD=d;best={c,r};}
-    }
-  }
-  if(best&&bestD<32){ targetC=best.c; targetR=best.r; walking=true; }
-  const rip=document.createElement('div');
-  rip.className='ripple';
-  rip.style.left=(e.clientX-rect.left)+'px';
-  rip.style.top=(e.clientY-rect.top)+'px';
-  gc.appendChild(rip);
-  setTimeout(()=>rip.remove(),380);
-});
 </script>
+
 </body>
 </html>
