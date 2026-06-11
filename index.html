@@ -26,7 +26,7 @@
   }
 
   body {
-    background: var(--bg);
+    background: transparent;
     color: var(--ink);
     font-family: var(--serif);
     font-weight: 300;
@@ -552,9 +552,392 @@
 </head>
 <body>
 
+<div id="page-learning" style="background:#F5F2EC; min-height:100vh; display:none;">
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Your Brain Forgets on Purpose</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0f0e0c;
+    color: #e8e2d4;
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #c8a96e;
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 700;
+    line-height: 1.08;
+    color: #f0e9d8;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: #c8a96e;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #7a7060;
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 3rem;
+    margin-top: 1rem;
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #5a5040;
+    margin-bottom: 1rem;
+    border-top: 0.5px solid #2a2820;
+    padding-top: 1.2rem;
+  }
+
+  .card {
+    background: #171510;
+    border: 0.5px solid #2e2b24;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+
+  .card:hover { border-color: #c8a96e44; background: #1a1812; }
+  .card.active { border-color: #c8a96e; background: #1c1a12; }
+
+  .card-num {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #4a4035;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: #e0d8c4;
+    margin-bottom: 0.6rem;
+  }
+
+  .card-body {
+    font-size: 12px;
+    color: #6a6050;
+    line-height: 1.75;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, color 0.2s;
+  }
+
+  .card.active .card-body {
+    max-height: 300px;
+    color: #9a9080;
+  }
+
+  .card-accent {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2e2b24;
+    transition: background 0.2s;
+  }
+
+  .card.active .card-accent { background: #c8a96e; }
+
+  .highlight-quote {
+    border-left: 2px solid #c8a96e;
+    padding: 1.2rem 1.5rem;
+    margin: 2.5rem 0;
+    background: #141210;
+  }
+
+  .highlight-quote p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: #c8b88e;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .highlight-quote cite {
+    font-size: 11px;
+    color: #5a5040;
+    letter-spacing: 0.1em;
+  }
+
+  .viz-container {
+    margin: 2.5rem 0;
+    background: #111008;
+    border: 0.5px solid #2e2b24;
+    border-radius: 6px;
+    padding: 1.5rem;
+  }
+
+  .viz-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: #5a5040;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .memory-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mem-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .mem-row-label {
+    font-size: 11px;
+    color: #6a6050;
+    width: 60px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .mem-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #2a2820;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .mem-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  .mem-bar-fill.detail { background: #4a7ca5; }
+  .mem-bar-fill.gist   { background: #c8a96e; }
+
+  .mem-pct {
+    font-size: 10px;
+    color: #4a4035;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #5a5040;
+    letter-spacing: 0.08em;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  .implication {
+    background: #111008;
+    border: 0.5px solid #c8a96e33;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .implication-header {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #c8a96e88;
+    margin-bottom: 0.8rem;
+  }
+
+  .implication p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: #a0988a;
+    line-height: 1.65;
+  }
+
+  .implication strong {
+    color: #e0d0a8;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .footer-note {
+    margin-top: 3rem;
+    font-size: 10px;
+    color: #3a3528;
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <div class="kicker">Neuroscience × Information Theory</div>
+  <h1>Why your brain<br><em>forgets</em> on purpose</h1>
+  <p class="subtitle">Forgetting is not a failure of memory. It is memory's most rational strategy. Here is why losing the details might be making you smarter.</p>
+
+  <div class="highlight-quote">
+    <p>"The brain does not record experience. It compresses it."</p>
+    <cite>— Frederic Bartlett, Remembering (1932)</cite>
+  </div>
+
+  <div class="viz-container">
+    <div class="viz-label">Retention over time — detail vs. gist</div>
+    <div class="memory-timeline" id="timeline"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#4a7ca5"></div>Verbatim detail</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c8a96e"></div>Gist / meaning</div>
+    </div>
+  </div>
+
+  <div class="section-label">Core ideas — tap to expand</div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-num">01</div>
+    <div class="card-accent"></div>
+    <div class="card-title">Fuzzy Trace Theory</div>
+    <div class="card-body">
+      Valerie Reyna's Fuzzy Trace Theory argues the brain stores two parallel traces of every experience: a verbatim trace (exact details) and a gist trace (meaning, pattern, essence). The verbatim trace decays fast. The gist trace is durable. This is not a malfunction — the gist trace is the one you actually need for reasoning and decision-making. Most cognitive errors attributed to "bad memory" are actually the wrong trace being retrieved.
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-num">02</div>
+    <div class="card-accent"></div>
+    <div class="card-title">Forgetting as compression</div>
+    <div class="card-body">
+      Information theory frames memory as a lossy compression algorithm. A lossless record of every experience would be computationally catastrophic — interference between overlapping memories would make retrieval impossible. The brain selectively discards low-signal variance (did she say "perhaps" or "maybe"?) and retains high-signal structure (she disagreed with the proposal). The cost is detail. The gain is a usable, generalizable model of the world.
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-num">03</div>
+    <div class="card-accent"></div>
+    <div class="card-title">The counterintuitive case of AJ</div>
+    <div class="card-body">
+      Jill Price (HSAM — Highly Superior Autobiographical Memory) can recall every day of her life since age 14 in vivid detail. She describes it as a burden, not a gift. Research on HSAM individuals shows they do not outperform average people on standard memory or intelligence tests, and often struggle with pattern recognition and abstraction. Total recall may actively interfere with gist formation — the very process that supports high-level reasoning.
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-num">04</div>
+    <div class="card-accent"></div>
+    <div class="card-title">Sleep as the editor</div>
+    <div class="card-body">
+      During slow-wave sleep, the hippocampus replays the day's experiences — but selectively. High-emotional-salience and high-novelty events get preferentially consolidated. Routine, redundant, or irrelevant detail is pruned. This is not random decay. It is a deliberate editorial process. The brain is making a judgment call about what is worth keeping. Disrupting sleep doesn't just impair learning — it disrupts the pruning, which may be equally damaging to cognition.
+    </div>
+  </div>
+
+  <div class="implication">
+    <div class="implication-header">The uncomfortable implication</div>
+    <p>If forgetting is adaptive, then the goal of a good memory system is not to retain more — it is to <strong>retain the right things</strong>. Strategies built around perfect recall (rote repetition, passive re-reading, highlighting) fight against the brain's architecture. Strategies that force gist extraction (retrieval practice, teaching, summarization) work with it. You are not trying to remember everything. You are trying to build a model.</p>
+  </div>
+
+  <div class="footer-note">
+    Sources: Reyna &amp; Brainerd (1995) / Walker &amp; Stickgold (2006) / Parker et al. (2006) on HSAM / Ebbinghaus (1885) forgetting curve
+  </div>
+
+</div>
+
+<script>
+  function toggle(el) {
+    const wasActive = el.classList.contains('active');
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    if (!wasActive) el.classList.add('active');
+  }
+
+  const timepoints = ['1 hr', '1 day', '1 wk', '1 mo', '1 yr'];
+  const detail =    [95, 42, 18, 10, 5];
+  const gist =      [70, 65, 60, 55, 50];
+
+  const tl = document.getElementById('timeline');
+  timepoints.forEach((t, i) => {
+    tl.innerHTML += `
+      <div class="mem-row">
+        <div class="mem-row-label">${t}</div>
+        <div class="mem-bar-track"><div class="mem-bar-fill detail" style="width:0%" data-target="${detail[i]}"></div></div>
+        <div class="mem-pct">${detail[i]}%</div>
+        <div class="mem-bar-track"><div class="mem-bar-fill gist" style="width:0%" data-target="${gist[i]}"></div></div>
+        <div class="mem-pct">${gist[i]}%</div>
+      </div>`;
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.mem-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 200);
+</script>
+</body>
+</html>
+</div>
+
 <div class="noise"></div>
 
-<div class="container">
+<div class="container" style="background: #F5F2EC;">
 
   <header class="header">
     <div class="header-eyebrow">AAU CET-UG · Exam prep approach</div>
